@@ -1,0 +1,41 @@
+{
+  "groups": {
+    "A": ["USA", "FRA", "MAR", "KOR"],
+    "B": ["MEX", "GER", "SEN", "JPN"],
+    "C": ["CAN", "ESP", "NGA", "AUS"],
+    "D": ["HON", "ENG", "ALG", "BRA"],
+    "E": ["PAN", "POR", "CMR", "ARG"],
+    "F": ["CRC", "NED", "RSA", "COL"],
+    "G": ["JAM", "ITA", "CIV", "IRQ"],
+    "H": ["SLV", "BEL", "EGY", "URU"],
+    "I": ["UKR", "CRO", "ECU", "SAU"],
+    "J": ["SUI", "POL", "TUN", "BOL"],
+    "K": ["TUR", "AUT", "PRY", "UZB"],
+    "L": ["SRB", "DEN", "NZL", "IRN"]
+  },
+  "tournament": {
+    "name": "FIFA World Cup 2026",
+    "host_countries": ["United States", "Mexico", "Canada"],
+    "start_date": "2026-06-11",
+    "final_date": "2026-07-19",
+    "total_teams": 48,
+    "total_matches": 104
+  },
+  "venues": [
+    {"name": "MetLife Stadium", "city": "New York/New Jersey", "country": "USA", "capacity": 82500},
+    {"name": "SoFi Stadium", "city": "Inglewood, CA", "country": "USA", "capacity": 70240},
+    {"name": "AT&T Stadium", "city": "Arlington, TX", "country": "USA", "capacity": 80000},
+    {"name": "Levi's Stadium", "city": "Santa Clara, CA", "country": "USA", "capacity": 68500},
+    {"name": "Mercedes-Benz Stadium", "city": "Atlanta, GA", "country": "USA", "capacity": 71000},
+    {"name": "Hard Rock Stadium", "city": "Miami Gardens, FL", "country": "USA", "capacity": 65326},
+    {"name": "Arrowhead Stadium", "city": "Kansas City, MO", "country": "USA", "capacity": 76416},
+    {"name": "Gillette Stadium", "city": "Foxborough, MA", "country": "USA", "capacity": 65878},
+    {"name": "Lincoln Financial Field", "city": "Philadelphia, PA", "country": "USA", "capacity": 69796},
+    {"name": "Lumen Field", "city": "Seattle, WA", "country": "USA", "capacity": 72000},
+    {"name": "BC Place", "city": "Vancouver, BC", "country": "Canada", "capacity": 54500},
+    {"name": "BMO Field", "city": "Toronto, ON", "country": "Canada", "capacity": 45000},
+    {"name": "Estadio Azteca", "city": "Mexico City", "country": "Mexico", "capacity": 87523},
+    {"name": "Estadio BBVA", "city": "Monterrey", "country": "Mexico", "capacity": 53500},
+    {"name": "Estadio Akron", "city": "Guadalajara", "country": "Mexico", "capacity": 45000}
+  ]
+}
