@@ -148,6 +148,23 @@ def load_app():
 
 
 # ═══════════════════════════════════════════════════════════════
+# TRANSLATIONS
+# ═══════════════════════════════════════════════════════════════
+STAGE_TR = {
+    "Group Stage": "Fase de Grupos",
+    "Round of 32": "Dieciseisavos de Final",
+    "Round of 16": "Octavos de Final",
+    "Quarter-finals": "Cuartos de Final",
+    "Semi-finals": "Semifinales",
+    "3rd Place Play-off": "Partido por el 3er Puesto",
+    "Final": "Final",
+}
+
+_MONTH_ES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun",
+             "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+
+
+# ═══════════════════════════════════════════════════════════════
 # HELPERS
 # ═══════════════════════════════════════════════════════════════
 def team_badge(team_id: str, fm: FixtureManager, size: str = "md") -> str:
@@ -179,7 +196,7 @@ def prob_bar_html(home_prob: float, draw_prob: float, away_prob: float,
         </div>
     </div>
     <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888;">
-        <span>{home_name}</span><span>Draw</span><span>{away_name}</span>
+        <span>{home_name}</span><span>Empate</span><span>{away_name}</span>
     </div>
     """
 
@@ -190,7 +207,8 @@ def days_until(target: date) -> int:
 
 def format_date(d: str) -> str:
     try:
-        return datetime.strptime(d, "%Y-%m-%d").strftime("%b %d, %Y")
+        dt = datetime.strptime(d, "%Y-%m-%d")
+        return f"{dt.day} {_MONTH_ES[dt.month - 1]} {dt.year}"
     except Exception:
         return d
 
@@ -200,7 +218,7 @@ def format_date(d: str) -> str:
 # ═══════════════════════════════════════════════════════════════
 def page_home(fm: FixtureManager, engine: ForecastEngine):
     st.markdown('<div class="page-header">⚽ Comnegolf es Mundial</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-sub">The ultimate tournament forecaster — USA · Canada · Mexico</div>',
+    st.markdown('<div class="page-sub">El pronosticador definitivo del torneo — EE.UU. · Canadá · México</div>',
                 unsafe_allow_html=True)
 
     # ── Countdown ────────────────────────────────────────────────
@@ -212,28 +230,28 @@ def page_home(fm: FixtureManager, engine: ForecastEngine):
     <div class="countdown-wrap">
         <div class="countdown-block">
             <div class="countdown-num">{d}</div>
-            <div class="countdown-unit">Days</div>
+            <div class="countdown-unit">Días</div>
         </div>
         <div class="countdown-block">
             <div class="countdown-num">{hours}</div>
-            <div class="countdown-unit">Hours</div>
+            <div class="countdown-unit">Horas</div>
         </div>
         <div class="countdown-block">
             <div class="countdown-num">{minutes}</div>
-            <div class="countdown-unit">Minutes</div>
+            <div class="countdown-unit">Minutos</div>
         </div>
     </div>
-    <p style="text-align:center; color:#888; font-size:0.85rem;">Until kick-off · June 11, 2026</p>
+    <p style="text-align:center; color:#888; font-size:0.85rem;">Hasta el inicio · 11 de junio de 2026</p>
     """, unsafe_allow_html=True)
 
     # ── Key Stats ────────────────────────────────────────────────
     c1, c2, c3, c4, c5 = st.columns(5)
     stats = [
-        ("48", "Teams"),
-        ("12", "Groups"),
-        ("104", "Matches"),
-        ("3", "Host Nations"),
-        ("16", "Venues"),
+        ("48", "Equipos"),
+        ("12", "Grupos"),
+        ("104", "Partidos"),
+        ("3", "Países Anfitriones"),
+        ("16", "Sedes"),
     ]
     for col, (val, lbl) in zip([c1, c2, c3, c4, c5], stats):
         with col:
@@ -250,7 +268,7 @@ def page_home(fm: FixtureManager, engine: ForecastEngine):
     col_l, col_r = st.columns([3, 2])
 
     with col_l:
-        st.subheader("🏆 Tournament Winner Forecast")
+        st.subheader("🏆 Pronóstico del Ganador del Torneo")
         win_probs = engine.tournament_winner_probs(fm)
         # Top 12 favourites
         top = sorted(win_probs.items(), key=lambda x: x[1], reverse=True)[:12]
@@ -285,15 +303,15 @@ def page_home(fm: FixtureManager, engine: ForecastEngine):
         st.plotly_chart(fig, use_container_width=True)
 
     with col_r:
-        st.subheader("📅 Tournament Schedule")
+        st.subheader("📅 Calendario del Torneo")
         timeline = [
-            ("June 11 – July 3", "Group Stage", "🟩"),
-            ("July 4 – 7",       "Round of 32", "🟨"),
-            ("July 8 – 11",      "Round of 16", "🟧"),
-            ("July 12 – 13",     "Quarter-finals", "🟥"),
-            ("July 15 – 16",     "Semi-finals",   "🔵"),
-            ("July 18",          "3rd Place",     "⚪"),
-            ("July 19",          "⭐ Final",       "🏆"),
+            ("11 Jun – 3 Jul", "Fase de Grupos", "🟩"),
+            ("4 – 7 Jul",       "Dieciseisavos de Final", "🟨"),
+            ("8 – 11 Jul",      "Octavos de Final", "🟧"),
+            ("12 – 13 Jul",     "Cuartos de Final", "🟥"),
+            ("15 – 16 Jul",     "Semifinales",   "🔵"),
+            ("18 Jul",          "3er Puesto",     "⚪"),
+            ("19 Jul",          "⭐ Final",       "🏆"),
         ]
         for dates, stage, icon in timeline:
             st.markdown(f"""
@@ -306,7 +324,7 @@ def page_home(fm: FixtureManager, engine: ForecastEngine):
     st.markdown("---")
 
     # ── Confederation breakdown ──────────────────────────────────
-    st.subheader("🌍 Teams by Confederation")
+    st.subheader("🌍 Equipos por Confederación")
     confs = {}
     for t in fm.teams.values():
         c = t["confederation"]
@@ -340,8 +358,8 @@ def page_home(fm: FixtureManager, engine: ForecastEngine):
 # PAGE: FIXTURES
 # ═══════════════════════════════════════════════════════════════
 def page_fixtures(fm: FixtureManager, engine: ForecastEngine):
-    st.markdown('<div class="page-header">📅 Fixtures</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-sub">All 104 matches — filter by stage, group or team</div>',
+    st.markdown('<div class="page-header">📅 Partidos</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-sub">Los 104 partidos — filtra por fase, grupo o equipo</div>',
                 unsafe_allow_html=True)
 
     # ── Filters ──────────────────────────────────────────────────
@@ -349,14 +367,17 @@ def page_fixtures(fm: FixtureManager, engine: ForecastEngine):
     with col1:
         stage_opts = ["All Stages", "Group Stage", "Round of 32", "Round of 16",
                       "Quarter-finals", "Semi-finals", "3rd Place Play-off", "Final"]
-        selected_stage = st.selectbox("Stage", stage_opts)
+        selected_stage = st.selectbox("Fase", stage_opts,
+                                      format_func=lambda s: "Todas las Fases" if s == "All Stages" else STAGE_TR.get(s, s))
     with col2:
         group_opts = ["All Groups"] + list(fm.groups.keys())
-        selected_group = st.selectbox("Group", group_opts)
+        selected_group = st.selectbox("Grupo", group_opts,
+                                      format_func=lambda g: "Todos los Grupos" if g == "All Groups" else f"Grupo {g}")
     with col3:
         team_names = {tid: f"{t['flag']} {t['name']}" for tid, t in fm.teams.items()}
         team_opts = ["All Teams"] + sorted(team_names.values())
-        selected_team_display = st.selectbox("Team", team_opts)
+        selected_team_display = st.selectbox("Equipo", team_opts,
+                                             format_func=lambda t: "Todos los Equipos" if t == "All Teams" else t)
 
     selected_team_id = None
     if selected_team_display != "All Teams":
@@ -375,21 +396,21 @@ def page_fixtures(fm: FixtureManager, engine: ForecastEngine):
         matches = [m for m in matches
                    if m["home"] == selected_team_id or m["away"] == selected_team_id]
 
-    st.markdown(f"**{len(matches)} matches** found")
+    st.markdown(f"**{len(matches)} partidos** encontrados")
 
     # ── Match cards ───────────────────────────────────────────────
-    show_predictions = st.toggle("Show AI Predictions", value=True)
+    show_predictions = st.toggle("Mostrar Predicciones IA", value=True)
 
     for m in matches:
         ht = fm.get_team(m["home"])
         at = fm.get_team(m["away"])
         h_flag = ht.get("flag", "🏳️") if m["home"] != "TBD" else "❓"
         a_flag = at.get("flag", "🏳️") if m["away"] != "TBD" else "❓"
-        h_name = ht.get("name", m["home"]) if m["home"] != "TBD" else "TBD"
-        a_name = at.get("name", m["away"]) if m["away"] != "TBD" else "TBD"
+        h_name = ht.get("name", m["home"]) if m["home"] != "TBD" else "PD"
+        a_name = at.get("name", m["away"]) if m["away"] != "TBD" else "PD"
 
-        group_tag = f"Group {m['group']}" if m["group"] else ""
-        stage_tag = m["stage"]
+        group_tag = f"Grupo {m['group']}" if m["group"] else ""
+        stage_tag = STAGE_TR.get(m["stage"], m["stage"])
 
         score_html = ""
         if m["status"] == "completed":
@@ -439,28 +460,28 @@ def page_fixtures(fm: FixtureManager, engine: ForecastEngine):
 # PAGE: GROUPS
 # ═══════════════════════════════════════════════════════════════
 def page_groups(fm: FixtureManager, engine: ForecastEngine):
-    st.markdown('<div class="page-header">👥 Group Stage</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-sub">Standings, qualification probabilities and group fixtures</div>',
+    st.markdown('<div class="page-header">👥 Fase de Grupos</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-sub">Clasificación, probabilidades de clasificación y partidos del grupo</div>',
                 unsafe_allow_html=True)
 
-    selected_group = st.selectbox("Select Group", list(fm.groups.keys()),
-                                  format_func=lambda g: f"Group {g}")
+    selected_group = st.selectbox("Seleccionar Grupo", list(fm.groups.keys()),
+                                  format_func=lambda g: f"Grupo {g}")
 
     group_teams = fm.groups[selected_group]
 
     # ── Simulate qualification probabilities ─────────────────────
-    with st.spinner("Running Monte-Carlo simulation…"):
+    with st.spinner("Ejecutando simulación Monte-Carlo…"):
         qual_probs = engine.predict_group(group_teams, fm)
 
     col_l, col_r = st.columns([3, 2])
 
     with col_l:
         # ── Standings table ─────────────────────────────────────
-        st.subheader(f"Group {selected_group} Standings")
+        st.subheader(f"Clasificación del Grupo {selected_group}")
         standings = fm.get_group_standings(selected_group)
 
         if all(row["P"] == 0 for row in standings):
-            st.info("No results yet — showing pre-tournament standings by ELO rating.")
+            st.info("Sin resultados aún — mostrando clasificación previa al torneo por puntuación ELO.")
             standings = sorted(
                 [{"team": t, "P": 0, "W": 0, "D": 0, "L": 0,
                   "GF": 0, "GA": 0, "GD": 0, "Pts": 0}
@@ -478,24 +499,24 @@ def page_groups(fm: FixtureManager, engine: ForecastEngine):
             pos_emoji = ["🥇", "🥈", "🥉", "4️⃣"][i]
             rows.append({
                 "Pos": pos_emoji,
-                "Team": f"{t.get('flag','🏳️')} {t.get('name', row['team'])}",
-                "P": row["P"], "W": row["W"], "D": row["D"], "L": row["L"],
-                "GF": row["GF"], "GA": row["GA"], "GD": row["GD"],
+                "Equipo": f"{t.get('flag','🏳️')} {t.get('name', row['team'])}",
+                "PJ": row["P"], "G": row["W"], "E": row["D"], "P": row["L"],
+                "GF": row["GF"], "GC": row["GA"], "DG": row["GD"],
                 "Pts": row["Pts"],
-                "Qualify %": f"{q_pct}%",
-                "Win Group %": f"{w_pct}%",
+                "Clasif. %": f"{q_pct}%",
+                "Ganar Grupo %": f"{w_pct}%",
             })
 
         df = pd.DataFrame(rows)
         st.dataframe(df, use_container_width=True, hide_index=True,
                      column_config={
-                         "Qualify %":   st.column_config.TextColumn("Qualify %"),
-                         "Win Group %": st.column_config.TextColumn("Win Group %"),
+                         "Clasif. %":   st.column_config.TextColumn("Clasif. %"),
+                         "Ganar Grupo %": st.column_config.TextColumn("Ganar Grupo %"),
                      })
 
     with col_r:
         # ── Qualification probability donut chart ────────────────
-        st.subheader("Qualification Probability")
+        st.subheader("Probabilidad de Clasificación")
         team_labels, team_probs, team_colors = [], [], []
         colors = ["#FFD700", "#C0C0C0", "#CD7F32", "#666666"]
         for i, tid in enumerate(
@@ -518,7 +539,7 @@ def page_groups(fm: FixtureManager, engine: ForecastEngine):
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="white"),
-            yaxis=dict(title="Probability (%)", showgrid=True, gridcolor="#2a2a4e"),
+            yaxis=dict(title="Probabilidad (%)", showgrid=True, gridcolor="#2a2a4e"),
             xaxis=dict(showgrid=False),
             margin=dict(t=30, b=10),
             height=300,
@@ -528,7 +549,7 @@ def page_groups(fm: FixtureManager, engine: ForecastEngine):
     st.markdown("---")
 
     # ── Group Fixtures ────────────────────────────────────────────
-    st.subheader(f"Group {selected_group} Fixtures")
+    st.subheader(f"Partidos del Grupo {selected_group}")
     for m in fm.get_group_fixtures(selected_group):
         ht = fm.get_team(m["home"])
         at = fm.get_team(m["away"])
@@ -546,7 +567,7 @@ def page_groups(fm: FixtureManager, engine: ForecastEngine):
                 </div>
                 <div style="text-align:center; min-width:120px;">
                     <div style="color:#FFD700; font-weight:900;">{score}</div>
-                    <div style="color:#888; font-size:0.72rem;">MD{m['matchday']} · {format_date(m['date'])}</div>
+                    <div style="color:#888; font-size:0.72rem;">JN{m['matchday']} · {format_date(m['date'])}</div>
                 </div>
                 <div style="flex:1;">
                     <span style="font-size:1.4rem;">{at.get('flag','🏳️')}</span>
@@ -563,8 +584,8 @@ def page_groups(fm: FixtureManager, engine: ForecastEngine):
 # PAGE: BRACKET
 # ═══════════════════════════════════════════════════════════════
 def page_bracket(fm: FixtureManager, engine: ForecastEngine):
-    st.markdown('<div class="page-header">🏆 Knockout Bracket</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-sub">Visual bracket — teams advance once Group Stage results are entered</div>',
+    st.markdown('<div class="page-header">🏆 Cuadro Eliminatorio</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-sub">Cuadro visual — los equipos avanzan cuando se registran los resultados de la fase de grupos</div>',
                 unsafe_allow_html=True)
 
     ko_stages = ["Round of 32", "Round of 16", "Quarter-finals",
@@ -574,12 +595,12 @@ def page_bracket(fm: FixtureManager, engine: ForecastEngine):
     for col, stage in zip(cols, ko_stages):
         matches = fm.get_stage_fixtures(stage)
         with col:
-            st.markdown(f"**{stage}**")
+            st.markdown(f"**{STAGE_TR.get(stage, stage)}**")
             for m in matches:
                 ht = fm.get_team(m["home"])
                 at = fm.get_team(m["away"])
-                h_name = ht.get("name", m["home"]) if m["home"] != "TBD" else "TBD"
-                a_name = at.get("name", m["away"]) if m["away"] != "TBD" else "TBD"
+                h_name = ht.get("name", m["home"]) if m["home"] != "TBD" else "PD"
+                a_name = at.get("name", m["away"]) if m["away"] != "TBD" else "PD"
                 h_flag = ht.get("flag", "❓") if m["home"] != "TBD" else "❓"
                 a_flag = at.get("flag", "❓") if m["away"] != "TBD" else "❓"
 
@@ -611,7 +632,7 @@ def page_bracket(fm: FixtureManager, engine: ForecastEngine):
 
     # ── 3rd Place match ───────────────────────────────────────────
     st.markdown("---")
-    st.subheader("🥉 3rd Place Play-off · July 18")
+    st.subheader("🥉 Partido por el 3er Puesto · 18 de julio")
     third = fm.get_stage_fixtures("3rd Place Play-off")
     if third:
         m = third[0]
@@ -639,29 +660,31 @@ def page_bracket(fm: FixtureManager, engine: ForecastEngine):
 # PAGE: PREDICTIONS
 # ═══════════════════════════════════════════════════════════════
 def page_predictions(fm: FixtureManager, engine: ForecastEngine):
-    st.markdown('<div class="page-header">🎯 My Predictions</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-sub">Submit your match predictions and track your score</div>',
+    st.markdown('<div class="page-header">🎯 Mis Predicciones</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-sub">Envía tus predicciones de partidos y sigue tu puntuación</div>',
                 unsafe_allow_html=True)
 
     if "user_predictions" not in st.session_state:
         st.session_state.user_predictions = {}  # match_id → {"home": int, "away": int}
 
     # ── Filter: only group stage for now ─────────────────────────
-    stage_filter = st.selectbox("Stage to predict", ["Group Stage", "Round of 32",
-                                                      "Round of 16", "Quarter-finals",
-                                                      "Semi-finals", "Final"])
+    stage_keys = ["Group Stage", "Round of 32",
+                  "Round of 16", "Quarter-finals",
+                  "Semi-finals", "Final"]
+    stage_filter = st.selectbox("Fase a predecir", stage_keys,
+                                format_func=lambda s: STAGE_TR.get(s, s))
 
     group_filter = None
     if stage_filter == "Group Stage":
-        group_filter = st.selectbox("Group", list(fm.groups.keys()),
-                                    format_func=lambda g: f"Group {g}")
+        group_filter = st.selectbox("Grupo", list(fm.groups.keys()),
+                                    format_func=lambda g: f"Grupo {g}")
 
     matches = [m for m in fm.fixtures if m["stage"] == stage_filter
                and m["home"] != "TBD"]
     if group_filter:
         matches = [m for m in matches if m.get("group") == group_filter]
 
-    st.markdown(f"**{len(matches)} matches available to predict**")
+    st.markdown(f"**{len(matches)} partidos disponibles para predecir**")
     st.markdown("---")
 
     pred_count = 0
@@ -678,7 +701,7 @@ def page_predictions(fm: FixtureManager, engine: ForecastEngine):
                 <span style="color:#888; font-size:0.8rem;">{format_date(m['date'])} · {m['time']}</span>
                 <span style="background:#0a2a1a; color:#FFD700; border-radius:20px;
                              padding:2px 10px; font-size:0.72rem;">
-                    {m['stage']}{f" · Group {m['group']}" if m['group'] else ""}
+                    {STAGE_TR.get(m['stage'], m['stage'])}{f" · Grupo {m['group']}" if m['group'] else ""}
                 </span>
             </div>
             <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:8px;">
@@ -689,7 +712,7 @@ def page_predictions(fm: FixtureManager, engine: ForecastEngine):
                 <span style="font-size:1.5rem;">{at.get('flag','🏳️')}</span>
             </div>
             <div style="color:#666; font-size:0.78rem; text-align:center; margin-bottom:8px;">
-                🤖 AI: {ai_pred['predicted_home']}–{ai_pred['predicted_away']}
+                🤖 IA: {ai_pred['predicted_home']}–{ai_pred['predicted_away']}
                 (Conf: {ai_pred['confidence']*100:.0f}%)
             </div>
             """, unsafe_allow_html=True)
@@ -697,7 +720,7 @@ def page_predictions(fm: FixtureManager, engine: ForecastEngine):
             c1, c2, c3 = st.columns([2, 1, 2])
             with c1:
                 h_goals = st.number_input(
-                    f"{ht.get('name', m['home'])} goals",
+                    f"Goles de {ht.get('name', m['home'])}",
                     min_value=0, max_value=20,
                     value=existing.get("home", ai_pred["predicted_home"]),
                     key=f"home_{m['id']}",
@@ -708,19 +731,19 @@ def page_predictions(fm: FixtureManager, engine: ForecastEngine):
                             unsafe_allow_html=True)
             with c3:
                 a_goals = st.number_input(
-                    f"{at.get('name', m['away'])} goals",
+                    f"Goles de {at.get('name', m['away'])}",
                     min_value=0, max_value=20,
                     value=existing.get("away", ai_pred["predicted_away"]),
                     key=f"away_{m['id']}",
                     label_visibility="collapsed",
                 )
 
-            if st.button(f"💾 Save prediction", key=f"save_{m['id']}"):
+            if st.button(f"💾 Guardar predicción", key=f"save_{m['id']}"):
                 st.session_state.user_predictions[m["id"]] = {
                     "home": h_goals, "away": a_goals,
                     "match_id": m["id"],
                 }
-                st.success(f"Saved: {ht.get('name')} {h_goals} – {a_goals} {at.get('name')}")
+                st.success(f"Guardado: {ht.get('name')} {h_goals} – {a_goals} {at.get('name')}")
                 pred_count += 1
 
             st.markdown("---")
@@ -728,7 +751,7 @@ def page_predictions(fm: FixtureManager, engine: ForecastEngine):
     # ── Prediction summary ────────────────────────────────────────
     total_preds = len(st.session_state.user_predictions)
     if total_preds:
-        st.subheader(f"📊 Your Predictions ({total_preds} saved)")
+        st.subheader(f"📊 Tus Predicciones ({total_preds} guardadas)")
         rows = []
         for mid, pred in st.session_state.user_predictions.items():
             match = next((m for m in fm.fixtures if m["id"] == mid), None)
@@ -736,13 +759,13 @@ def page_predictions(fm: FixtureManager, engine: ForecastEngine):
                 ht = fm.get_team(match["home"])
                 at = fm.get_team(match["away"])
                 rows.append({
-                    "Match": f"{ht.get('flag','')} {ht.get('name','')} vs {at.get('flag','')} {at.get('name','')}",
-                    "Your Score": f"{pred['home']} – {pred['away']}",
-                    "Date": format_date(match["date"]),
+                    "Partido": f"{ht.get('flag','')} {ht.get('name','')} vs {at.get('flag','')} {at.get('name','')}",
+                    "Tu Marcador": f"{pred['home']} – {pred['away']}",
+                    "Fecha": format_date(match["date"]),
                 })
         st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
-        if st.button("🗑️ Clear All Predictions", type="secondary"):
+        if st.button("🗑️ Borrar Todas las Predicciones", type="secondary"):
             st.session_state.user_predictions = {}
             st.rerun()
 
@@ -751,29 +774,29 @@ def page_predictions(fm: FixtureManager, engine: ForecastEngine):
 # PAGE: ANALYTICS
 # ═══════════════════════════════════════════════════════════════
 def page_analytics(fm: FixtureManager, engine: ForecastEngine):
-    st.markdown('<div class="page-header">📊 Analytics</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-sub">Team comparisons, ELO ratings, historical performance</div>',
+    st.markdown('<div class="page-header">📊 Análisis</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-sub">Comparaciones de equipos, puntuaciones ELO, rendimiento histórico</div>',
                 unsafe_allow_html=True)
 
-    tab1, tab2, tab3 = st.tabs(["🆚 Head-to-Head Comparator", "🌍 ELO Rankings", "🏅 Historical Performance"])
+    tab1, tab2, tab3 = st.tabs(["🆚 Comparador Directo", "🌍 Ranking ELO", "🏅 Rendimiento Histórico"])
 
     # ── Tab 1: Head-to-Head ─────────────────────────────────────
     with tab1:
-        st.subheader("Head-to-Head Match Simulator")
+        st.subheader("Simulador de Enfrentamientos Directos")
         team_options = {tid: f"{t['flag']} {t['name']}" for tid, t in fm.teams.items()}
 
         col_a, col_b = st.columns(2)
         with col_a:
-            home_team = st.selectbox("Home Team", sorted(team_options.values()),
+            home_team = st.selectbox("Equipo Local", sorted(team_options.values()),
                                      index=0, key="h2h_home")
         with col_b:
-            away_team = st.selectbox("Away Team", sorted(team_options.values()),
+            away_team = st.selectbox("Equipo Visitante", sorted(team_options.values()),
                                      index=5, key="h2h_away")
 
         home_id = next(tid for tid, v in team_options.items() if v == home_team)
         away_id = next(tid for tid, v in team_options.items() if v == away_team)
 
-        neutral = st.checkbox("Neutral venue", value=False)
+        neutral = st.checkbox("Sede neutral", value=False)
 
         if home_id != away_id:
             pred = engine.predict_match(home_id, away_id, neutral=neutral)
@@ -797,7 +820,7 @@ def page_analytics(fm: FixtureManager, engine: ForecastEngine):
                 st.markdown(f"""
                 <div class="metric-card">
                     <div class="metric-value">{round(pred['draw_prob']*100)}%</div>
-                    <div class="metric-label">Draw</div>
+                    <div class="metric-label">Empate</div>
                     <div style="color:#888; font-size:0.8rem; margin-top:8px;">
                         Pred: {pred['predicted_home']}–{pred['predicted_away']}<br>
                         Conf: {round(pred['confidence']*100)}%
@@ -825,13 +848,13 @@ def page_analytics(fm: FixtureManager, engine: ForecastEngine):
             col_stat1, col_stat2 = st.columns(2)
             with col_stat1:
                 xg_fig = go.Figure(go.Bar(
-                    x=["Expected Goals"],
+                    x=["Goles Esperados"],
                     y=[pred["expected_home"]],
                     name=ht["name"],
                     marker_color="#1a8a4a",
                 ))
                 xg_fig.add_trace(go.Bar(
-                    x=["Expected Goals"],
+                    x=["Goles Esperados"],
                     y=[pred["expected_away"]],
                     name=at["name"],
                     marker_color="#8a1a1a",
@@ -841,7 +864,7 @@ def page_analytics(fm: FixtureManager, engine: ForecastEngine):
                     paper_bgcolor="rgba(0,0,0,0)",
                     plot_bgcolor="rgba(0,0,0,0)",
                     font=dict(color="white"),
-                    title="Expected Goals (xG)",
+                    title="Goles Esperados (xG)",
                     height=280,
                     margin=dict(t=40, b=10),
                 )
@@ -859,21 +882,21 @@ def page_analytics(fm: FixtureManager, engine: ForecastEngine):
                     paper_bgcolor="rgba(0,0,0,0)",
                     plot_bgcolor="rgba(0,0,0,0)",
                     font=dict(color="white"),
-                    title="ELO Rating Comparison",
+                    title="Comparación de Puntuación ELO",
                     yaxis=dict(showgrid=True, gridcolor="#2a2a4e"),
                     height=280,
                     margin=dict(t=40, b=10),
                 )
                 st.plotly_chart(elo_fig, use_container_width=True)
 
-            st.info(f"⚙️ Model: {pred['method']}")
+            st.info(f"⚙️ Modelo: {pred['method']}")
         else:
-            st.warning("Please select two different teams.")
+            st.warning("Por favor selecciona dos equipos diferentes.")
 
     # ── Tab 2: ELO Rankings ─────────────────────────────────────
     with tab2:
-        st.subheader("ELO Ratings — All 48 Teams")
-        conf_filter = st.multiselect("Filter by Confederation",
+        st.subheader("Puntuaciones ELO — Los 48 Equipos")
+        conf_filter = st.multiselect("Filtrar por Confederación",
                                      ["UEFA", "CONMEBOL", "CONCACAF", "CAF", "AFC", "OFC"],
                                      default=["UEFA", "CONMEBOL", "CONCACAF", "CAF", "AFC", "OFC"])
 
@@ -882,11 +905,11 @@ def page_analytics(fm: FixtureManager, engine: ForecastEngine):
             if t["confederation"] not in conf_filter:
                 continue
             elo_rows.append({
-                "Team": f"{t['flag']} {t['name']}",
-                "Confederation": t["confederation"],
+                "Equipo": f"{t['flag']} {t['name']}",
+                "Confederación": t["confederation"],
                 "ELO": t.get("elo_rating", 0),
-                "FIFA Rank": t.get("fifa_ranking", 99),
-                "WC Titles": t.get("world_cup_titles", 0),
+                "Ranking FIFA": t.get("fifa_ranking", 99),
+                "Títulos Mundiales": t.get("world_cup_titles", 0),
             })
         elo_df = pd.DataFrame(elo_rows).sort_values("ELO", ascending=False).reset_index(drop=True)
         elo_df.index += 1
@@ -896,8 +919,8 @@ def page_analytics(fm: FixtureManager, engine: ForecastEngine):
             "CONCACAF": "#ff7f0e", "CAF": "#d62728",
             "AFC": "#9467bd", "OFC": "#8c564b",
         }
-        fig = px.bar(elo_df, x="ELO", y="Team", orientation="h",
-                     color="Confederation",
+        fig = px.bar(elo_df, x="ELO", y="Equipo", orientation="h",
+                     color="Confederación",
                      color_discrete_map=conf_color_map,
                      height=max(400, len(elo_df) * 22))
         fig.update_layout(
@@ -913,20 +936,20 @@ def page_analytics(fm: FixtureManager, engine: ForecastEngine):
 
     # ── Tab 3: Historical ────────────────────────────────────────
     with tab3:
-        st.subheader("Head-to-Head: World Cup Winners")
-        st.caption("All-time record between nations that have won the FIFA World Cup (competitive & friendly matches).")
+        st.subheader("Enfrentamientos Directos: Campeones del Mundo")
+        st.caption("Historial completo entre selecciones ganadoras de la Copa Mundial FIFA (partidos competitivos y amistosos).")
 
         # Hard-coded H2H data for WC-winning nations
         # (Team A, Team B, Played, A Wins, Draws, B Wins)
         wc_winner_ids = {
-            "BRA": ("🇧🇷", "Brazil"),
-            "GER": ("🇩🇪", "Germany"),
-            "ITA": ("🇮🇹", "Italy"),
+            "BRA": ("🇧🇷", "Brasil"),
+            "GER": ("🇩🇪", "Alemania"),
+            "ITA": ("🇮🇹", "Italia"),
             "ARG": ("🇦🇷", "Argentina"),
-            "FRA": ("🇫🇷", "France"),
+            "FRA": ("🇫🇷", "Francia"),
             "URU": ("🇺🇾", "Uruguay"),
-            "ESP": ("🇪🇸", "Spain"),
-            "ENG": ("🏴󠁧󠁢󠁥󠁮󠁧󠁿", "England"),
+            "ESP": ("🇪🇸", "España"),
+            "ENG": ("🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Inglaterra"),
         }
 
         h2h_data = [
@@ -965,11 +988,11 @@ def page_analytics(fm: FixtureManager, engine: ForecastEngine):
             fa, na = wc_winner_ids[a]
             fb, nb = wc_winner_ids[b]
             h2h_rows.append({
-                "Rivalry": f"{fa} {na} vs {fb} {nb}",
-                "Played": played,
-                f"{na} W": aw,
-                "Draws": d,
-                f"{nb} W": bw,
+                "Rivalidad": f"{fa} {na} vs {fb} {nb}",
+                "Jugados": played,
+                f"{na} V": aw,
+                "Empates": d,
+                f"{nb} V": bw,
                 "_sort": played,
             })
 
@@ -979,21 +1002,21 @@ def page_analytics(fm: FixtureManager, engine: ForecastEngine):
         top_rivals = h2h_df.head(15).copy()
         fig3 = go.Figure()
         fig3.add_trace(go.Bar(
-            y=top_rivals["Rivalry"],
-            x=top_rivals["Played"],
+            y=top_rivals["Rivalidad"],
+            x=top_rivals["Jugados"],
             orientation="h",
             marker_color="#FFD700",
-            text=top_rivals["Played"],
+            text=top_rivals["Jugados"],
             textposition="inside",
-            name="Matches Played",
+            name="Partidos Jugados",
         ))
         fig3.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="white"),
-            title="Most Played Rivalries — WC Winners",
+            title="Rivalidades Más Jugadas — Campeones del Mundo",
             yaxis=dict(autorange="reversed", showgrid=False),
-            xaxis=dict(showgrid=True, gridcolor="#2a2a4e", title="Total Matches"),
+            xaxis=dict(showgrid=True, gridcolor="#2a2a4e", title="Total de Partidos"),
             margin=dict(l=10, r=20, t=40, b=10),
             height=440,
         )
@@ -1046,12 +1069,12 @@ def main():
         st.markdown("---")
 
         page = st.radio("", [
-            "🏠 Home",
-            "📅 Fixtures",
-            "👥 Groups",
-            "🏆 Bracket",
-            "🎯 Predictions",
-            "📊 Analytics",
+            "🏠 Inicio",
+            "📅 Partidos",
+            "👥 Grupos",
+            "🏆 Eliminatorias",
+            "🎯 Predicciones",
+            "📊 Análisis",
         ], label_visibility="collapsed")
 
         st.markdown("---")
@@ -1060,30 +1083,30 @@ def main():
         done  = fm.completed_matches
         st.markdown(f"""
         <div style="font-size:0.78rem; color:#aaa; padding:8px 0;">
-            <div>✅ {done} / {total} matches played</div>
-            <div>📝 {len(st.session_state.get('user_predictions', {}))} predictions saved</div>
+            <div>✅ {done} / {total} partidos jugados</div>
+            <div>📝 {len(st.session_state.get('user_predictions', {}))} predicciones guardadas</div>
         </div>
         """, unsafe_allow_html=True)
 
         st.markdown("---")
         st.markdown("""
         <div style="font-size:0.7rem; color:#555; text-align:center;">
-            🔬 Forecast powered by ELO model<br>
-            <span style="color:#FFD700;">Plug in your own model → core/forecast.py</span>
+            🔬 Pronóstico impulsado por modelo ELO<br>
+            <span style="color:#FFD700;">Conecta tu propio modelo → core/forecast.py</span>
         </div>
         """, unsafe_allow_html=True)
 
-    if page == "🏠 Home":
+    if page == "🏠 Inicio":
         page_home(fm, engine)
-    elif page == "📅 Fixtures":
+    elif page == "📅 Partidos":
         page_fixtures(fm, engine)
-    elif page == "👥 Groups":
+    elif page == "👥 Grupos":
         page_groups(fm, engine)
-    elif page == "🏆 Bracket":
+    elif page == "🏆 Eliminatorias":
         page_bracket(fm, engine)
-    elif page == "🎯 Predictions":
+    elif page == "🎯 Predicciones":
         page_predictions(fm, engine)
-    elif page == "📊 Analytics":
+    elif page == "📊 Análisis":
         page_analytics(fm, engine)
 
 
