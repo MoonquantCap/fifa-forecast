@@ -1,6 +1,6 @@
 """
-FIFA World Cup 2026 Forecast App
-=================================
+Comnegolf es Mundial
+====================
 Run with:  streamlit run app.py
 """
 import sys, os
@@ -19,7 +19,7 @@ from core.forecast import ForecastEngine
 # PAGE CONFIG
 # ═══════════════════════════════════════════════════════════════
 st.set_page_config(
-    page_title="FIFA 2026 Forecast",
+    page_title="Comnegolf es Mundial",
     page_icon="⚽",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -143,7 +143,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 @st.cache_resource
 def load_app():
     fm = FixtureManager()
-    engine = ForecastEngine(fm.teams)
+    engine = ForecastEngine(fm.teams, fm.groups)
     return fm, engine
 
 
@@ -199,7 +199,7 @@ def format_date(d: str) -> str:
 # PAGE: HOME
 # ═══════════════════════════════════════════════════════════════
 def page_home(fm: FixtureManager, engine: ForecastEngine):
-    st.markdown('<div class="page-header">⚽ FIFA World Cup 2026</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-header">⚽ Comnegolf es Mundial</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-sub">The ultimate tournament forecaster — USA · Canada · Mexico</div>',
                 unsafe_allow_html=True)
 
@@ -913,37 +913,93 @@ def page_analytics(fm: FixtureManager, engine: ForecastEngine):
 
     # ── Tab 3: Historical ────────────────────────────────────────
     with tab3:
-        st.subheader("Historical World Cup Performance")
-        hist_rows = []
-        for tid, t in fm.teams.items():
-            hist_rows.append({
-                "Team": f"{t['flag']} {t['name']}",
-                "Titles": t.get("world_cup_titles", 0),
-                "Best Result": t.get("best_result", "N/A"),
-                "Confederation": t["confederation"],
-            })
-        hist_df = pd.DataFrame(hist_rows).sort_values("Titles", ascending=False)
+        st.subheader("Head-to-Head: World Cup Winners")
+        st.caption("All-time record between nations that have won the FIFA World Cup (competitive & friendly matches).")
 
-        # Bubble chart: ELO vs FIFA Ranking colored by titles
-        fig3 = px.scatter(
-            hist_df, x="Titles", y="Team",
-            color="Confederation",
-            color_discrete_map=conf_color_map,
-            title="World Cup Titles by Team",
-            height=400,
-        )
+        # Hard-coded H2H data for WC-winning nations
+        # (Team A, Team B, Played, A Wins, Draws, B Wins)
+        wc_winner_ids = {
+            "BRA": ("🇧🇷", "Brazil"),
+            "GER": ("🇩🇪", "Germany"),
+            "ITA": ("🇮🇹", "Italy"),
+            "ARG": ("🇦🇷", "Argentina"),
+            "FRA": ("🇫🇷", "France"),
+            "URU": ("🇺🇾", "Uruguay"),
+            "ESP": ("🇪🇸", "Spain"),
+            "ENG": ("🏴󠁧󠁢󠁥󠁮󠁧󠁿", "England"),
+        }
+
+        h2h_data = [
+            ("BRA", "ARG", 109, 44, 25, 40),
+            ("BRA", "URU",  77, 37, 19, 21),
+            ("ARG", "URU",  56, 22, 15, 19),
+            ("ITA", "ESP",  38, 13, 13, 12),
+            ("GER", "ENG",  37, 15, 12, 10),
+            ("ITA", "FRA",  35, 14, 11, 10),
+            ("GER", "ITA",  35, 12, 11, 12),
+            ("FRA", "ENG",  32, 13, 10,  9),
+            ("FRA", "ESP",  33, 13, 11,  9),
+            ("GER", "FRA",  28, 13,  7,  8),
+            ("ITA", "ENG",  27, 11,  9,  7),
+            ("BRA", "ITA",  27, 10,  9,  8),
+            ("BRA", "GER",  23, 12,  4,  7),
+            ("BRA", "ESP",  23, 11,  7,  5),
+            ("GER", "ESP",  24, 10,  7,  7),
+            ("BRA", "ENG",  25, 12,  7,  6),
+            ("ARG", "GER",  20,  9,  4,  7),
+            ("ARG", "ESP",  18,  8,  5,  5),
+            ("ITA", "URU",  15,  7,  5,  3),
+            ("BRA", "FRA",  15,  7,  5,  3),
+            ("ARG", "ITA",  17,  7,  5,  5),
+            ("ARG", "FRA",  12,  6,  3,  3),
+            ("URU", "ESP",  12,  4,  4,  4),
+            ("URU", "ENG",  10,  4,  3,  3),
+            ("FRA", "URU",  10,  5,  3,  2),
+            ("GER", "URU",  10,  5,  3,  2),
+            ("ARG", "ENG",  16,  7,  4,  5),
+            ("ESP", "ENG",  28, 12,  9,  7),
+        ]
+
+        h2h_rows = []
+        for a, b, played, aw, d, bw in h2h_data:
+            fa, na = wc_winner_ids[a]
+            fb, nb = wc_winner_ids[b]
+            h2h_rows.append({
+                "Rivalry": f"{fa} {na} vs {fb} {nb}",
+                "Played": played,
+                f"{na} W": aw,
+                "Draws": d,
+                f"{nb} W": bw,
+                "_sort": played,
+            })
+
+        h2h_df = pd.DataFrame(h2h_rows).sort_values("_sort", ascending=False).drop(columns=["_sort"])
+
+        # Horizontal bar: top rivalries by matches played
+        top_rivals = h2h_df.head(15).copy()
+        fig3 = go.Figure()
+        fig3.add_trace(go.Bar(
+            y=top_rivals["Rivalry"],
+            x=top_rivals["Played"],
+            orientation="h",
+            marker_color="#FFD700",
+            text=top_rivals["Played"],
+            textposition="inside",
+            name="Matches Played",
+        ))
         fig3.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             font=dict(color="white"),
-            yaxis=dict(showgrid=False),
-            legend=dict(bgcolor="rgba(0,0,0,0)"),
-            margin=dict(t=40, b=10),
+            title="Most Played Rivalries — WC Winners",
+            yaxis=dict(autorange="reversed", showgrid=False),
+            xaxis=dict(showgrid=True, gridcolor="#2a2a4e", title="Total Matches"),
+            margin=dict(l=10, r=20, t=40, b=10),
+            height=440,
         )
         st.plotly_chart(fig3, use_container_width=True)
 
-        st.dataframe(hist_df[["Team", "Titles", "Best Result"]],
-                     use_container_width=True, hide_index=True)
+        st.dataframe(h2h_df, use_container_width=True, hide_index=True)
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -954,10 +1010,37 @@ def main():
 
     with st.sidebar:
         st.markdown("""
-        <div style="text-align:center; padding:16px 0 8px;">
-            <div style="font-size:3rem;">⚽</div>
-            <div style="font-size:1.1rem; font-weight:900; color:#FFD700;">FIFA 2026</div>
-            <div style="font-size:0.75rem; color:#aaa;">World Cup Forecast</div>
+        <div style="text-align:center; padding:12px 0 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="140" height="140">
+              <!-- Shield background -->
+              <path d="M100 8 L185 40 L185 120 Q185 170 100 195 Q15 170 15 120 L15 40 Z"
+                    fill="#1a1a1a" stroke="#FFD700" stroke-width="4"/>
+              <!-- Yellow vertical stripes -->
+              <clipPath id="shield-clip">
+                <path d="M100 8 L185 40 L185 120 Q185 170 100 195 Q15 170 15 120 L15 40 Z"/>
+              </clipPath>
+              <g clip-path="url(#shield-clip)">
+                <rect x="37" y="0" width="14" height="200" fill="#FFD700" opacity="0.35"/>
+                <rect x="65" y="0" width="14" height="200" fill="#FFD700" opacity="0.35"/>
+                <rect x="121" y="0" width="14" height="200" fill="#FFD700" opacity="0.35"/>
+                <rect x="149" y="0" width="14" height="200" fill="#FFD700" opacity="0.35"/>
+              </g>
+              <!-- Soccer ball -->
+              <circle cx="100" cy="52" r="26" fill="white" stroke="#1a1a1a" stroke-width="2"/>
+              <polygon points="100,34 112,43 108,57 92,57 88,43" fill="#1a1a1a"/>
+              <polygon points="100,70 112,61 123,68 119,82 81,82 77,68 88,61" fill="none"/>
+              <circle cx="100" cy="52" r="26" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+              <!-- ConmeGolf text -->
+              <text x="100" y="98" text-anchor="middle" font-family="Arial Black, sans-serif"
+                    font-size="14" font-weight="900" fill="#FFD700" letter-spacing="1">ConmeGolf</text>
+              <!-- es Mundial box -->
+              <rect x="22" y="105" width="156" height="40" rx="4" fill="#FFD700"/>
+              <text x="100" y="133" text-anchor="middle" font-family="Arial Black, sans-serif"
+                    font-size="22" font-weight="900" fill="#1a1a1a" letter-spacing="1">es Mundial</text>
+              <!-- Year -->
+              <text x="100" y="170" text-anchor="middle" font-family="Arial, sans-serif"
+                    font-size="13" font-weight="700" fill="#FFD700" letter-spacing="2">2026</text>
+            </svg>
         </div>
         """, unsafe_allow_html=True)
         st.markdown("---")

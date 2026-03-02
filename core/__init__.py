@@ -1,1 +1,1 @@
-# FIFA 2026 Forecast App - Core Module
+# Comnegolf es Mundial - Core Module
