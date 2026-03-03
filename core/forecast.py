@@ -161,34 +161,211 @@ class ForecastEngine:
             for t in group_teams
         }
 
-    def tournament_winner_probs(self, fixture_manager) -> dict:
+    # ── Group simulation helper (returns full ranking) ──────────────────────
+
+    def _simulate_group_once(self, group_teams, pair_probs):
+        """Simulate one group stage using pre-computed pair probabilities.
+        Returns the full ranking [1st, 2nd, 3rd, 4th] with stats."""
+        pts  = {t: 0 for t in group_teams}
+        gd   = {t: 0 for t in group_teams}
+        gfor = {t: 0 for t in group_teams}
+        for (h, a), pred in pair_probs.items():
+            gh = _poisson(pred["expected_home"])
+            ga = _poisson(pred["expected_away"])
+            r = random.random()
+            if r < pred["home_win_prob"]:
+                if gh <= ga:
+                    gh, ga = ga + 1, gh
+                pts[h] += 3
+            elif r < pred["home_win_prob"] + pred["draw_prob"]:
+                ga = gh
+                pts[h] += 1; pts[a] += 1
+            else:
+                if ga <= gh:
+                    gh, ga = ga, gh + 1
+                pts[a] += 3
+            gfor[h] += gh; gfor[a] += ga
+            gd[h] += gh - ga; gd[a] += ga - gh
+        ranked = sorted(group_teams,
+                        key=lambda t: (pts[t], gd[t], gfor[t]),
+                        reverse=True)
+        return ranked, pts, gd, gfor
+
+    @staticmethod
+    def _build_r32_pairings(group_keys, first, second, third_qual):
         """
-        Approximate tournament-winner probabilities using ELO rating
-        (more football-accurate than FIFA ranking) plus a WC-titles bonus.
+        Build 16 R32 pairings for the 48-team format.
+        24 teams from top-2 + 8 best 3rd-place teams = 32.
 
-        Not a full bracket MC — kept fast for the home-page chart.
+        Pairing scheme (FIFA-style):
+          Match 1:  1A vs 3C/D/E/F    Match 9:  1G vs 3I/J/K/L
+          Match 2:  2A vs 2C          Match 10: 2G vs 2I
+          Match 3:  1B vs 3A/B/E/F    Match 11: 1H vs 3G/H/K/L
+          Match 4:  2B vs 2D          Match 12: 2H vs 2J
+          Match 5:  1C vs 3A/B/C/D    Match 13: 1I vs 3G/H/I/J
+          Match 6:  2E vs 2F          Match 14: 2K vs 2L
+          Match 7:  1D vs 3C/D/G/H    Match 15: 1J vs 3I/J/K/L
+          Match 8:  1E vs 1F          Match 16: 1K vs 1L
+
+        Simplified: 1st-place teams face 3rd-place or cross-group 2nd;
+        we use a deterministic bracket seeding.
         """
-        teams = fixture_manager.teams
+        # Simple bracket: pair group winners with best-3rd, and runners-up cross
+        # Slot the 8 qualified 3rd-place teams in order
+        t3 = list(third_qual)  # already sorted best→worst
 
-        # Normalise ELO scores to [0, 1]
-        elos = {tid: t.get("elo_rating", 1500) for tid, t in teams.items()}
-        max_e = max(elos.values())
-        min_e = min(elos.values())
-        span  = max(max_e - min_e, 1)
-        elo_scores = {tid: (e - min_e) / span for tid, e in elos.items()}
+        pairs = [
+            (first["A"], t3[0] if len(t3) > 0 else second["C"]),
+            (second["A"], second["C"]),
+            (first["B"], t3[1] if len(t3) > 1 else second["D"]),
+            (second["B"], second["D"]),
+            (first["C"], t3[2] if len(t3) > 2 else second["E"]),
+            (second["E"], second["F"]),
+            (first["D"], t3[3] if len(t3) > 3 else second["F"]),
+            (first["E"], first["F"]),
+            (first["G"], t3[4] if len(t3) > 4 else second["I"]),
+            (second["G"], second["I"]),
+            (first["H"], t3[5] if len(t3) > 5 else second["J"]),
+            (second["H"], second["J"]),
+            (first["I"], t3[6] if len(t3) > 6 else second["K"]),
+            (second["K"], second["L"]),
+            (first["J"], t3[7] if len(t3) > 7 else second["L"]),
+            (first["K"], first["L"]),
+        ]
+        return pairs
 
-        strengths: dict[str, float] = {}
-        for tid, t in teams.items():
-            es = elo_scores.get(tid, 0.5)
-            # WC titles give a small logarithmic bonus (diminishing returns)
-            titles = t.get("world_cup_titles", 0)
-            titles_bonus = math.log1p(titles) * 0.12
-            strengths[tid] = es + titles_bonus
+    def tournament_winner_probs(self, fixture_manager, n_sim: int = 800) -> dict:
+        """
+        Full-bracket Monte Carlo tournament winner probabilities using the
+        ComneGolf algorithm (40% Rank + 40% H2H + 20% RW + headstart).
 
-        # Softmax with temperature=4 to sharpen the distribution
-        exp_s = {tid: math.exp(s * 4) for tid, s in strengths.items()}
-        total = sum(exp_s.values())
-        return {tid: round(v / total, 4) for tid, v in exp_s.items()}
+        48-team format: top 2 per group (24) + 8 best 3rd-place = 32 in R32.
+        Simulates R32→SF.  The Final is NOT decided — SF winners are tallied.
+        """
+        groups = fixture_manager.groups
+        group_keys = sorted(groups.keys())
+        rank_scores = _normalize_rankings(self.teams)
+
+        # Pre-compute all group pairwise match probabilities
+        group_pair_probs: dict[str, dict[tuple, dict]] = {}
+        for gk in group_keys:
+            g_teams = groups[gk]
+            pair_probs: dict[tuple, dict] = {}
+            for i, h in enumerate(g_teams):
+                for a in g_teams[i + 1:]:
+                    pair_probs[(h, a)] = compute_match_probs(
+                        h, a, teams=self.teams,
+                        neutral=True, in_same_group=True,
+                        n_iter=N_ITER_GROUP,
+                    )
+            group_pair_probs[gk] = pair_probs
+
+        win_count: dict[str, int] = {tid: 0 for tid in self.teams}
+
+        for _ in range(n_sim):
+            first: dict[str, str] = {}
+            second: dict[str, str] = {}
+            thirds: list[tuple] = []  # (team_id, pts, gd, gf)
+
+            for gk in group_keys:
+                g_teams = groups[gk]
+                ranked, pts, gd, gfor = self._simulate_group_once(
+                    g_teams, group_pair_probs[gk])
+                first[gk] = ranked[0]
+                second[gk] = ranked[1]
+                thirds.append((ranked[2], pts[ranked[2]],
+                               gd[ranked[2]], gfor[ranked[2]]))
+
+            # Best 8 of 12 third-place teams
+            thirds.sort(key=lambda x: (x[1], x[2], x[3]), reverse=True)
+            third_qual = [t[0] for t in thirds[:8]]
+
+            # Build R32 bracket
+            r32_pairs = self._build_r32_pairings(
+                group_keys, first, second, third_qual)
+
+            # Simulate KO rounds using pre-computed rank scores for speed
+            def _quick_ko(hid, aid):
+                rh = rank_scores.get(hid, 0.5)
+                ra = rank_scores.get(aid, 0.5)
+                p_home = rh / (rh + ra) if (rh + ra) > 0 else 0.5
+                return hid if random.random() < p_home else aid
+
+            r16 = [_quick_ko(h, a) for h, a in r32_pairs]
+            qf = [_quick_ko(r16[i], r16[i+1]) for i in range(0, 16, 2)]
+            sf = [_quick_ko(qf[i], qf[i+1]) for i in range(0, 8, 2)]
+            finalists = [_quick_ko(sf[i], sf[i+1]) for i in range(0, 4, 2)]
+
+            for w in finalists:
+                win_count[w] += 1
+
+        return {tid: round(cnt / (n_sim * 2), 4)
+                for tid, cnt in win_count.items()}
+
+    def simulate_knockout(self, fixture_manager) -> tuple:
+        """
+        Single deterministic knockout bracket using ComneGolf MC.
+
+        48-team format: top 2 per group (24) + 8 best 3rd = 32 in R32.
+        Returns (bracket, qualifiers) where bracket has stages R32→SF.
+        The Final is NOT decided — left open.
+        """
+        groups = fixture_manager.groups
+        group_keys = sorted(groups.keys())
+
+        first: dict[str, str] = {}
+        second: dict[str, str] = {}
+        all_thirds: list[tuple] = []  # (team, group, qualify_prob)
+
+        for gk in group_keys:
+            g_teams = groups[gk]
+            qp = self.predict_group(g_teams, fixture_manager)
+            ranked = sorted(g_teams,
+                            key=lambda t: (qp[t]["qualify_prob"], qp[t]["win_prob"]),
+                            reverse=True)
+            first[gk] = ranked[0]
+            second[gk] = ranked[1]
+            all_thirds.append((ranked[2], gk, qp[ranked[2]]["qualify_prob"]))
+
+        # Best 8 third-place teams
+        all_thirds.sort(key=lambda x: x[2], reverse=True)
+        third_qual = [t[0] for t in all_thirds[:8]]
+
+        qualifiers = {}
+        for gk in group_keys:
+            qualifiers[gk] = [first[gk], second[gk]]
+
+        # Build R32 bracket
+        r32_matches_pairs = self._build_r32_pairings(
+            group_keys, first, second, third_qual)
+
+        bracket: dict[str, list] = {}
+
+        def _run_round(pairs, stage_name):
+            results = []
+            winners = []
+            for h, a in pairs:
+                pred = self.predict_match(h, a, neutral=True)
+                winner = h if pred["home_win_prob"] >= pred["away_win_prob"] else a
+                results.append({
+                    "home": h, "away": a, "winner": winner, "pred": pred,
+                })
+                winners.append(winner)
+            bracket[stage_name] = results
+            return winners
+
+        r32_winners = _run_round(r32_matches_pairs, "Round of 32")
+        r16_pairs = [(r32_winners[i], r32_winners[i+1])
+                     for i in range(0, len(r32_winners), 2)]
+        r16_winners = _run_round(r16_pairs, "Round of 16")
+        qf_pairs = [(r16_winners[i], r16_winners[i+1])
+                    for i in range(0, len(r16_winners), 2)]
+        qf_winners = _run_round(qf_pairs, "Quarter-finals")
+        sf_pairs = [(qf_winners[i], qf_winners[i+1])
+                    for i in range(0, len(qf_winners), 2)]
+        _run_round(sf_pairs, "Semi-finals")
+
+        return bracket, qualifiers
 
     # ── Internal helpers ──────────────────────────────────────────────────────
 
