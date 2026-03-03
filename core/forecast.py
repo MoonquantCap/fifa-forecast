@@ -163,22 +163,27 @@ class ForecastEngine:
 
     def tournament_winner_probs(self, fixture_manager) -> dict:
         """
-        Approximate tournament-winner probabilities using the ComneGolf
-        composite strength signal (rank score + WC-titles bonus), exponentiated
-        to spread the distribution.
+        Approximate tournament-winner probabilities using ELO rating
+        (more football-accurate than FIFA ranking) plus a WC-titles bonus.
 
         Not a full bracket MC — kept fast for the home-page chart.
         """
         teams = fixture_manager.teams
-        rank_scores = _normalize_rankings(teams)
+
+        # Normalise ELO scores to [0, 1]
+        elos = {tid: t.get("elo_rating", 1500) for tid, t in teams.items()}
+        max_e = max(elos.values())
+        min_e = min(elos.values())
+        span  = max(max_e - min_e, 1)
+        elo_scores = {tid: (e - min_e) / span for tid, e in elos.items()}
 
         strengths: dict[str, float] = {}
         for tid, t in teams.items():
-            rs = rank_scores.get(tid, 0.5)
+            es = elo_scores.get(tid, 0.5)
             # WC titles give a small logarithmic bonus (diminishing returns)
             titles = t.get("world_cup_titles", 0)
             titles_bonus = math.log1p(titles) * 0.12
-            strengths[tid] = rs + titles_bonus
+            strengths[tid] = es + titles_bonus
 
         # Softmax with temperature=4 to sharpen the distribution
         exp_s = {tid: math.exp(s * 4) for tid, s in strengths.items()}

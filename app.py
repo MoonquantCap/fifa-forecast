@@ -480,14 +480,36 @@ def page_groups(fm: FixtureManager, engine: ForecastEngine):
         standings = fm.get_group_standings(selected_group)
 
         if all(row["P"] == 0 for row in standings):
-            st.info("Sin resultados aún — mostrando clasificación previa al torneo por puntuación ELO.")
-            standings = sorted(
-                [{"team": t, "P": 0, "W": 0, "D": 0, "L": 0,
-                  "GF": 0, "GA": 0, "GD": 0, "Pts": 0}
-                 for t in group_teams],
-                key=lambda x: fm.teams.get(x["team"], {}).get("elo_rating", 0),
-                reverse=True,
-            )
+            st.info("Sin resultados aún — mostrando clasificación simulada por IA (puntos esperados).")
+            # Build predicted standings using probability-weighted points and expected goals
+            sim = {t: {"team": t, "P": 0, "W": 0.0, "D": 0.0, "L": 0.0,
+                       "GF": 0.0, "GA": 0.0, "GD": 0.0, "Pts": 0.0}
+                   for t in group_teams}
+            for m in fm.get_group_fixtures(selected_group):
+                pred = engine.predict_match(m["home"], m["away"])
+                h, a = m["home"], m["away"]
+                hw, dp, aw = pred["home_win_prob"], pred["draw_prob"], pred["away_win_prob"]
+                sim[h]["P"] += 1;              sim[a]["P"] += 1
+                sim[h]["Pts"] += 3*hw + dp;   sim[a]["Pts"] += 3*aw + dp
+                sim[h]["W"]   += hw;           sim[a]["W"]   += aw
+                sim[h]["D"]   += dp;           sim[a]["D"]   += dp
+                sim[h]["L"]   += aw;           sim[a]["L"]   += hw
+                sim[h]["GF"]  += pred["expected_home"]
+                sim[h]["GA"]  += pred["expected_away"]
+                sim[a]["GF"]  += pred["expected_away"]
+                sim[a]["GA"]  += pred["expected_home"]
+            for row in sim.values():
+                row["GD"] = row["GF"] - row["GA"]
+                row["W"]  = round(row["W"],  1)
+                row["D"]  = round(row["D"],  1)
+                row["L"]  = round(row["L"],  1)
+                row["GF"] = round(row["GF"], 1)
+                row["GA"] = round(row["GA"], 1)
+                row["GD"] = round(row["GD"], 1)
+                row["Pts"] = round(row["Pts"], 1)
+            standings = sorted(sim.values(),
+                               key=lambda x: (x["Pts"], x["GD"], x["GF"]),
+                               reverse=True)
 
         rows = []
         for i, row in enumerate(standings):
