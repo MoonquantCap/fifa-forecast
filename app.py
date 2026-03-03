@@ -197,8 +197,7 @@ def prob_bar_html(home_prob: float, draw_prob: float, away_prob: float,
     </div>
     <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888;">
         <span>{home_name}</span><span>Empate</span><span>{away_name}</span>
-    </div>
-    """
+    </div>""".strip()
 
 
 def days_until(target: date) -> int:
