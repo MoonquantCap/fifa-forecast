@@ -194,9 +194,9 @@ def compute_match_probs(
         p_dom = S_home / total_s if total_s > 0 else 0.5
 
         # Expected goals: centred at 1.35/1.10 (avg WC scoring rates),
-        # scaled ±1.0 by dominance deviation from 0.5
-        lam_h = max(0.15, 1.35 + (p_dom - 0.5) * 2.0)
-        lam_a = max(0.15, 1.10 - (p_dom - 0.5) * 2.0)
+        # scaled ±1.5 by dominance deviation from 0.5
+        lam_h = max(0.15, 1.35 + (p_dom - 0.5) * 3.0)
+        lam_a = max(0.15, 1.10 - (p_dom - 0.5) * 3.0)
 
         gh = _poisson(lam_h)
         ga = _poisson(lam_a)
@@ -218,6 +218,23 @@ def compute_match_probs(
     exp_h   = total_gh  / n_iter
     exp_a   = total_ga  / n_iter
 
+    # Predicted scoreline: determine outcome first, then sample a Poisson-consistent score.
+    # High-scoring results are naturally tail events via the Poisson distribution.
+    if hw_prob >= d_prob and hw_prob >= aw_prob:
+        pred_outcome = "home"
+    elif d_prob >= hw_prob and d_prob >= aw_prob:
+        pred_outcome = "draw"
+    else:
+        pred_outcome = "away"
+    pred_gh = _poisson(exp_h)
+    pred_ga = _poisson(exp_a)
+    if pred_outcome == "home" and pred_gh <= pred_ga:
+        pred_gh = pred_ga + 1
+    elif pred_outcome == "away" and pred_ga <= pred_gh:
+        pred_ga = pred_gh + 1
+    elif pred_outcome == "draw":
+        pred_ga = pred_gh
+
     # Confidence: higher when signals agree (rank gap + H2H signal both present)
     rank_gap = abs(R_home - R_away)
     h2h_signal = abs(H_home - 0.5) * 2.0   # 0 if unknown, 1 if perfect record
@@ -235,8 +252,8 @@ def compute_match_probs(
         "away_win_prob":   round(aw_prob, 4),
         "expected_home":   round(exp_h, 2),
         "expected_away":   round(exp_a, 2),
-        "predicted_home":  max(0, round(exp_h)),
-        "predicted_away":  max(0, round(exp_a)),
+        "predicted_home":  pred_gh,
+        "predicted_away":  pred_ga,
         "confidence":      round(confidence, 2),
         "method": (
             f"ComneGolf MC · {n_iter:,} iters · "
