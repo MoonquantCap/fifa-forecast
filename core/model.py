@@ -235,8 +235,8 @@ def compute_match_probs(
         "away_win_prob":   round(aw_prob, 4),
         "expected_home":   round(exp_h, 2),
         "expected_away":   round(exp_a, 2),
-        "predicted_home":  max(0, round(exp_h - 0.5)),
-        "predicted_away":  max(0, round(exp_a - 0.5)),
+        "predicted_home":  max(0, round(exp_h)),
+        "predicted_away":  max(0, round(exp_a)),
         "confidence":      round(confidence, 2),
         "method": (
             f"ComneGolf MC · {n_iter:,} iters · "
