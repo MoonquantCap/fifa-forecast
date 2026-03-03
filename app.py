@@ -269,7 +269,9 @@ def page_home(fm: FixtureManager, engine: ForecastEngine):
 
     with col_l:
         st.subheader("🏆 Pronóstico del Ganador del Torneo")
-        win_probs = engine.tournament_winner_probs(fm)
+        st.caption("ComneGolf MC completo: 40% Rank + 40% H2H + 20% RW + Headstart")
+        with st.spinner("Simulando torneo completo…"):
+            win_probs = engine.tournament_winner_probs(fm)
         # Top 12 favourites
         top = sorted(win_probs.items(), key=lambda x: x[1], reverse=True)[:12]
 
@@ -399,7 +401,7 @@ def page_fixtures(fm: FixtureManager, engine: ForecastEngine):
     st.markdown(f"**{len(matches)} partidos** encontrados")
 
     # ── Match cards ───────────────────────────────────────────────
-    show_predictions = st.toggle("Mostrar Predicciones IA", value=True)
+    show_predictions = st.toggle("🤖 Pronóstico IA", value=True, key="fixtures_ia_toggle")
 
     for m in matches:
         ht = fm.get_team(m["home"])
@@ -469,9 +471,14 @@ def page_groups(fm: FixtureManager, engine: ForecastEngine):
 
     group_teams = fm.groups[selected_group]
 
+    use_ia = st.toggle("🤖 Pronóstico IA", value=True, key="groups_ia_toggle")
+
     # ── Simulate qualification probabilities ─────────────────────
-    with st.spinner("Ejecutando simulación Monte-Carlo…"):
-        qual_probs = engine.predict_group(group_teams, fm)
+    if use_ia:
+        with st.spinner("Ejecutando simulación Monte-Carlo…"):
+            qual_probs = engine.predict_group(group_teams, fm)
+    else:
+        qual_probs = {t: {"qualify_prob": 0, "win_prob": 0} for t in group_teams}
 
     col_l, col_r = st.columns([3, 2])
 
@@ -553,10 +560,19 @@ def page_groups(fm: FixtureManager, engine: ForecastEngine):
     for m in fm.get_group_fixtures(selected_group):
         ht = fm.get_team(m["home"])
         at = fm.get_team(m["away"])
-        pred = engine.predict_match(m["home"], m["away"])
-        score = (f'{m["home_score"]} – {m["away_score"]}'
-                 if m["status"] == "completed"
-                 else f'Pred: {pred["predicted_home"]}–{pred["predicted_away"]}')
+
+        if use_ia:
+            pred = engine.predict_match(m["home"], m["away"])
+            score = (f'{m["home_score"]} – {m["away_score"]}'
+                     if m["status"] == "completed"
+                     else f'Pred: {pred["predicted_home"]}–{pred["predicted_away"]}')
+            bar_html = prob_bar_html(pred['home_win_prob'], pred['draw_prob'], pred['away_win_prob'],
+                                     ht.get('name', m['home']), at.get('name', m['away']))
+        else:
+            score = (f'{m["home_score"]} – {m["away_score"]}'
+                     if m["status"] == "completed"
+                     else "VS")
+            bar_html = ""
 
         st.markdown(f"""
         <div class="match-card" style="padding:12px;">
@@ -574,8 +590,7 @@ def page_groups(fm: FixtureManager, engine: ForecastEngine):
                     <span style="font-weight:700; margin-left:6px;">{at.get('name', m['away'])}</span>
                 </div>
             </div>
-            {prob_bar_html(pred['home_win_prob'], pred['draw_prob'], pred['away_win_prob'],
-                           ht.get('name', m['home']), at.get('name', m['away']))}
+            {bar_html}
         </div>
         """, unsafe_allow_html=True)
 
@@ -585,75 +600,146 @@ def page_groups(fm: FixtureManager, engine: ForecastEngine):
 # ═══════════════════════════════════════════════════════════════
 def page_bracket(fm: FixtureManager, engine: ForecastEngine):
     st.markdown('<div class="page-header">🏆 Cuadro Eliminatorio</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-sub">Cuadro visual — los equipos avanzan cuando se registran los resultados de la fase de grupos</div>',
+    st.markdown('<div class="page-sub">Cuadro visual completo — la IA llena los equipos con el modelo ComneGolf MC</div>',
                 unsafe_allow_html=True)
 
-    ko_stages = ["Round of 32", "Round of 16", "Quarter-finals",
-                 "Semi-finals", "Final"]
+    use_ia = st.toggle("🤖 Pronóstico IA", value=True, key="bracket_ia_toggle")
 
-    cols = st.columns(len(ko_stages))
-    for col, stage in zip(cols, ko_stages):
-        matches = fm.get_stage_fixtures(stage)
-        with col:
-            st.markdown(f"**{STAGE_TR.get(stage, stage)}**")
-            for m in matches:
-                ht = fm.get_team(m["home"])
-                at = fm.get_team(m["away"])
-                h_name = ht.get("name", m["home"]) if m["home"] != "TBD" else "PD"
-                a_name = at.get("name", m["away"]) if m["away"] != "TBD" else "PD"
-                h_flag = ht.get("flag", "❓") if m["home"] != "TBD" else "❓"
-                a_flag = at.get("flag", "❓") if m["away"] != "TBD" else "❓"
+    if use_ia:
+        with st.spinner("Simulando eliminatorias con ComneGolf MC…"):
+            bracket_data, qualifiers = engine.simulate_knockout(fm)
 
-                # Determine winner display
-                winner_home = m["status"] == "completed" and m.get("home_score", 0) > m.get("away_score", 0)
-                winner_away = m["status"] == "completed" and m.get("away_score", 0) > m.get("home_score", 0)
+        ko_stages = ["Round of 32", "Round of 16", "Quarter-finals",
+                     "Semi-finals"]
 
-                score_display = ""
-                if m["status"] == "completed":
-                    score_display = f'{m["home_score"]}–{m["away_score"]}'
-                elif m["home"] != "TBD":
-                    pred = engine.predict_match(m["home"], m["away"])
+        cols = st.columns(len(ko_stages) + 1)  # +1 for Final placeholder
+        for col_idx, stage in enumerate(ko_stages):
+            stage_matches = bracket_data.get(stage, [])
+            with cols[col_idx]:
+                st.markdown(f"**{STAGE_TR.get(stage, stage)}**")
+                for md in stage_matches:
+                    h_id = md["home"]
+                    a_id = md["away"]
+                    w_id = md["winner"]
+                    pred = md["pred"]
+                    ht = fm.get_team(h_id)
+                    at = fm.get_team(a_id)
+                    h_name = ht.get("name", h_id)
+                    a_name = at.get("name", a_id)
+                    h_flag = ht.get("flag", "🏳️")
+                    a_flag = at.get("flag", "🏳️")
+
                     score_display = f'~{pred["predicted_home"]}–{pred["predicted_away"]}'
+                    h_style = "color:#FFD700; font-weight:700;" if w_id == h_id else ""
+                    a_style = "color:#FFD700; font-weight:700;" if w_id == a_id else ""
 
-                h_style = "color:#FFD700; font-weight:700;" if winner_home else ""
-                a_style = "color:#FFD700; font-weight:700;" if winner_away else ""
-
-                st.markdown(f"""
-                <div class="bracket-match">
-                    <div style="{h_style}">{h_flag} {h_name}</div>
-                    <div style="color:#FFD700; font-size:0.75rem; text-align:center;
-                                padding:2px 0;">{score_display if score_display else "–"}</div>
-                    <div style="{a_style}">{a_flag} {a_name}</div>
-                    <div style="color:#555; font-size:0.68rem; margin-top:4px;">
-                        📍 {m['city']} · {format_date(m['date'])}
+                    st.markdown(f"""
+                    <div class="bracket-match">
+                        <div style="{h_style}">{h_flag} {h_name}</div>
+                        <div style="color:#FFD700; font-size:0.75rem; text-align:center;
+                                    padding:2px 0;">{score_display}</div>
+                        <div style="{a_style}">{a_flag} {a_name}</div>
                     </div>
+                    """, unsafe_allow_html=True)
+
+        # Final column — left OPEN
+        with cols[len(ko_stages)]:
+            st.markdown(f"**{STAGE_TR.get('Final', 'Final')}**")
+            # Get SF winners as finalists
+            sf_matches = bracket_data.get("Semi-finals", [])
+            finalists = [md["winner"] for md in sf_matches]
+            if len(finalists) == 2:
+                f1 = fm.get_team(finalists[0])
+                f2 = fm.get_team(finalists[1])
+                st.markdown(f"""
+                <div class="bracket-match" style="border-color:#FFD700;">
+                    <div>{f1.get('flag','🏳️')} {f1.get('name', finalists[0])}</div>
+                    <div style="color:#FFD700; font-size:0.75rem; text-align:center;
+                                padding:2px 0;">🏆 Por decidir</div>
+                    <div>{f2.get('flag','🏳️')} {f2.get('name', finalists[1])}</div>
                 </div>
                 """, unsafe_allow_html=True)
 
-    # ── 3rd Place match ───────────────────────────────────────────
-    st.markdown("---")
-    st.subheader("🥉 Partido por el 3er Puesto · 18 de julio")
-    third = fm.get_stage_fixtures("3rd Place Play-off")
-    if third:
-        m = third[0]
-        c1, c2, c3 = st.columns([2, 1, 2])
-        ht = fm.get_team(m["home"])
-        at = fm.get_team(m["away"])
-        with c1:
-            st.markdown(f"""
-            <div style="text-align:right; padding:10px;">
-                <div style="font-size:2rem;">{ht.get('flag','❓')}</div>
-                <div style="font-weight:700;">{ht.get('name', m['home'])}</div>
-            </div>""", unsafe_allow_html=True)
-        with c2:
-            st.markdown('<div style="text-align:center; padding:20px 0; font-size:1.5rem; color:#FFD700;">VS</div>',
-                        unsafe_allow_html=True)
-        with c3:
-            st.markdown(f"""
-            <div style="padding:10px;">
-                <div style="font-size:2rem;">{at.get('flag','❓')}</div>
-                <div style="font-weight:700;">{at.get('name', m['away'])}</div>
-            </div>""", unsafe_allow_html=True)
+        # ── 3rd Place match ───────────────────────────────────────
+        st.markdown("---")
+        st.subheader("🥉 Partido por el 3er Puesto · 18 de julio")
+        sf_matches = bracket_data.get("Semi-finals", [])
+        losers = [md["away"] if md["winner"] == md["home"] else md["home"]
+                  for md in sf_matches]
+        if len(losers) == 2:
+            t1 = fm.get_team(losers[0])
+            t2 = fm.get_team(losers[1])
+            c1, c2, c3 = st.columns([2, 1, 2])
+            with c1:
+                st.markdown(f"""
+                <div style="text-align:right; padding:10px;">
+                    <div style="font-size:2rem;">{t1.get('flag','❓')}</div>
+                    <div style="font-weight:700;">{t1.get('name', losers[0])}</div>
+                </div>""", unsafe_allow_html=True)
+            with c2:
+                st.markdown('<div style="text-align:center; padding:20px 0; font-size:1.5rem; color:#FFD700;">VS</div>',
+                            unsafe_allow_html=True)
+            with c3:
+                st.markdown(f"""
+                <div style="padding:10px;">
+                    <div style="font-size:2rem;">{t2.get('flag','❓')}</div>
+                    <div style="font-weight:700;">{t2.get('name', losers[1])}</div>
+                </div>""", unsafe_allow_html=True)
+
+    else:
+        # ── Manual mode: original TBD bracket ────────────────────
+        st.info("Pronóstico IA desactivado — los equipos se llenarán cuando se registren resultados manualmente.")
+        ko_stages = ["Round of 32", "Round of 16", "Quarter-finals",
+                     "Semi-finals", "Final"]
+        cols = st.columns(len(ko_stages))
+        for col, stage in zip(cols, ko_stages):
+            matches = fm.get_stage_fixtures(stage)
+            with col:
+                st.markdown(f"**{STAGE_TR.get(stage, stage)}**")
+                for m in matches:
+                    ht = fm.get_team(m["home"])
+                    at = fm.get_team(m["away"])
+                    h_name = ht.get("name", m["home"]) if m["home"] != "TBD" else "PD"
+                    a_name = at.get("name", m["away"]) if m["away"] != "TBD" else "PD"
+                    h_flag = ht.get("flag", "❓") if m["home"] != "TBD" else "❓"
+                    a_flag = at.get("flag", "❓") if m["away"] != "TBD" else "❓"
+
+                    score_display = ""
+                    if m["status"] == "completed":
+                        score_display = f'{m["home_score"]}–{m["away_score"]}'
+
+                    st.markdown(f"""
+                    <div class="bracket-match">
+                        <div>{h_flag} {h_name}</div>
+                        <div style="color:#FFD700; font-size:0.75rem; text-align:center;
+                                    padding:2px 0;">{score_display if score_display else "–"}</div>
+                        <div>{a_flag} {a_name}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.subheader("🥉 Partido por el 3er Puesto · 18 de julio")
+        third = fm.get_stage_fixtures("3rd Place Play-off")
+        if third:
+            m = third[0]
+            c1, c2, c3 = st.columns([2, 1, 2])
+            ht = fm.get_team(m["home"])
+            at = fm.get_team(m["away"])
+            with c1:
+                st.markdown(f"""
+                <div style="text-align:right; padding:10px;">
+                    <div style="font-size:2rem;">{ht.get('flag','❓')}</div>
+                    <div style="font-weight:700;">{ht.get('name', m['home'])}</div>
+                </div>""", unsafe_allow_html=True)
+            with c2:
+                st.markdown('<div style="text-align:center; padding:20px 0; font-size:1.5rem; color:#FFD700;">VS</div>',
+                            unsafe_allow_html=True)
+            with c3:
+                st.markdown(f"""
+                <div style="padding:10px;">
+                    <div style="font-size:2rem;">{at.get('flag','❓')}</div>
+                    <div style="font-weight:700;">{at.get('name', m['away'])}</div>
+                </div>""", unsafe_allow_html=True)
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -685,13 +771,15 @@ def page_predictions(fm: FixtureManager, engine: ForecastEngine):
         matches = [m for m in matches if m.get("group") == group_filter]
 
     st.markdown(f"**{len(matches)} partidos disponibles para predecir**")
+
+    use_ia = st.toggle("🤖 Pronóstico IA (mostrar referencia)", value=True, key="predictions_ia_toggle")
     st.markdown("---")
 
     pred_count = 0
     for m in matches:
         ht = fm.get_team(m["home"])
         at = fm.get_team(m["away"])
-        ai_pred = engine.predict_match(m["home"], m["away"])
+        ai_pred = engine.predict_match(m["home"], m["away"]) if use_ia else None
         existing = st.session_state.user_predictions.get(m["id"], {})
 
         with st.container():
@@ -711,18 +799,21 @@ def page_predictions(fm: FixtureManager, engine: ForecastEngine):
                 <span style="font-weight:700;">{at.get('name', m['away'])}</span>
                 <span style="font-size:1.5rem;">{at.get('flag','🏳️')}</span>
             </div>
-            <div style="color:#666; font-size:0.78rem; text-align:center; margin-bottom:8px;">
+            {f'''<div style="color:#666; font-size:0.78rem; text-align:center; margin-bottom:8px;">
                 🤖 IA: {ai_pred['predicted_home']}–{ai_pred['predicted_away']}
                 (Conf: {ai_pred['confidence']*100:.0f}%)
-            </div>
+            </div>''' if ai_pred else ''}
             """, unsafe_allow_html=True)
+
+            default_home = existing.get("home", ai_pred["predicted_home"] if ai_pred else 0)
+            default_away = existing.get("away", ai_pred["predicted_away"] if ai_pred else 0)
 
             c1, c2, c3 = st.columns([2, 1, 2])
             with c1:
                 h_goals = st.number_input(
                     f"Goles de {ht.get('name', m['home'])}",
                     min_value=0, max_value=20,
-                    value=existing.get("home", ai_pred["predicted_home"]),
+                    value=default_home,
                     key=f"home_{m['id']}",
                     label_visibility="collapsed",
                 )
@@ -733,7 +824,7 @@ def page_predictions(fm: FixtureManager, engine: ForecastEngine):
                 a_goals = st.number_input(
                     f"Goles de {at.get('name', m['away'])}",
                     min_value=0, max_value=20,
-                    value=existing.get("away", ai_pred["predicted_away"]),
+                    value=default_away,
                     key=f"away_{m['id']}",
                     label_visibility="collapsed",
                 )
