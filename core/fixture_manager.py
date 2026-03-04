@@ -11,19 +11,20 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
 # ── Venue pool (cycled round-robin for group stage) ──────────────────────────
 VENUES = [
-    ("MetLife Stadium", "New York/NJ", "USA"),
+    ("Estadio Azteca", "Mexico City", "Mexico"),
     ("SoFi Stadium", "Inglewood, CA", "USA"),
+    ("BMO Field", "Toronto, ON", "Canada"),
+    ("MetLife Stadium", "New York/NJ", "USA"),
     ("AT&T Stadium", "Arlington, TX", "USA"),
     ("Levi's Stadium", "Santa Clara, CA", "USA"),
     ("Mercedes-Benz Stadium", "Atlanta, GA", "USA"),
     ("Hard Rock Stadium", "Miami, FL", "USA"),
+    ("NRG Stadium", "Houston, TX", "USA"),
     ("Arrowhead Stadium", "Kansas City, MO", "USA"),
     ("Gillette Stadium", "Foxborough, MA", "USA"),
     ("Lincoln Financial Field", "Philadelphia, PA", "USA"),
     ("Lumen Field", "Seattle, WA", "USA"),
     ("BC Place", "Vancouver, BC", "Canada"),
-    ("BMO Field", "Toronto, ON", "Canada"),
-    ("Estadio Azteca", "Mexico City", "Mexico"),
     ("Estadio BBVA", "Monterrey", "Mexico"),
     ("Estadio Akron", "Guadalajara", "Mexico"),
 ]
@@ -115,10 +116,10 @@ class FixtureManager:
 
         # ── Knockout Stage slots (TBD teams) ─────────────────────────────────
         ko_stages = [
-            ("Round of 32", 16, date(2026, 7, 4)),
-            ("Round of 16", 8,  date(2026, 7, 8)),
-            ("Quarter-finals", 4, date(2026, 7, 12)),
-            ("Semi-finals", 2, date(2026, 7, 15)),
+            ("Round of 32", 16, date(2026, 6, 28)),
+            ("Round of 16", 8,  date(2026, 7, 4)),
+            ("Quarter-finals", 4, date(2026, 7, 9)),
+            ("Semi-finals", 2, date(2026, 7, 14)),
             ("3rd Place Play-off", 1, date(2026, 7, 18)),
             ("Final", 1, date(2026, 7, 19)),
         ]
