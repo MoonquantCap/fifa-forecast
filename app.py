@@ -1191,12 +1191,15 @@ def main():
         st.markdown("---")
         st.markdown("""
         <a href="https://ics.fixtur.es/v2/league/fifa-world-cup-2026.ics"
-           style="display:block; text-align:center; padding:8px 12px;
-                  background:#FFD700; color:#1a1a1a; border-radius:6px;
-                  font-weight:700; font-size:0.85rem; text-decoration:none;">
-            📆 Agregar al calendario
+           target="_blank"
+           style="display:block; text-align:center; padding:10px 12px;
+                  background:#FFD700; border-radius:6px;
+                  font-size:0.85rem; text-decoration:none !important;">
+            <span style="color:#1a1a1a !important; font-weight:800;">
+                📆 Agregar al calendario
+            </span>
         </a>
-        <div style="font-size:0.68rem; color:#777; text-align:center; padding:4px 0 0;">
+        <div style="font-size:0.68rem; color:#888; text-align:center; padding:4px 0 0;">
             Suscribite con Google / Apple / Outlook
         </div>
         """, unsafe_allow_html=True)
