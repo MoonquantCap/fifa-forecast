@@ -1,43 +1,15 @@
 """
-Fixture Manager — loads teams/groups and generates the full 104-match schedule.
-Results are stored in session state so every page stays in sync.
+Fixture Manager — loads teams, groups and the official 2026 World Cup schedule.
+
+The 104-match schedule lives in data/schedule.json with all kickoff times in
+Argentina time (ART, UTC-3). Group-stage entries reference the four teams of
+each group by slot index (0-3); knockout entries are TBD until the group
+stage completes.
 """
 import json
 import os
-from datetime import date, timedelta
-from itertools import combinations
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
-
-# ── Venue pool (cycled round-robin for group stage) ──────────────────────────
-VENUES = [
-    ("Estadio Azteca", "Mexico City", "Mexico"),
-    ("SoFi Stadium", "Inglewood, CA", "USA"),
-    ("BMO Field", "Toronto, ON", "Canada"),
-    ("MetLife Stadium", "New York/NJ", "USA"),
-    ("AT&T Stadium", "Arlington, TX", "USA"),
-    ("Levi's Stadium", "Santa Clara, CA", "USA"),
-    ("Mercedes-Benz Stadium", "Atlanta, GA", "USA"),
-    ("Hard Rock Stadium", "Miami, FL", "USA"),
-    ("NRG Stadium", "Houston, TX", "USA"),
-    ("Arrowhead Stadium", "Kansas City, MO", "USA"),
-    ("Gillette Stadium", "Foxborough, MA", "USA"),
-    ("Lincoln Financial Field", "Philadelphia, PA", "USA"),
-    ("Lumen Field", "Seattle, WA", "USA"),
-    ("BC Place", "Vancouver, BC", "Canada"),
-    ("Estadio BBVA", "Monterrey", "Mexico"),
-    ("Estadio Akron", "Guadalajara", "Mexico"),
-]
-
-# Knockout stage venues (larger stadiums for bigger games)
-KO_VENUES = [
-    ("MetLife Stadium", "New York/NJ", "USA"),
-    ("SoFi Stadium", "Inglewood, CA", "USA"),
-    ("AT&T Stadium", "Arlington, TX", "USA"),
-    ("Mercedes-Benz Stadium", "Atlanta, GA", "USA"),
-    ("Hard Rock Stadium", "Miami, FL", "USA"),
-    ("Estadio Azteca", "Mexico City", "Mexico"),
-]
 
 
 class FixtureManager:
@@ -46,7 +18,8 @@ class FixtureManager:
         self.groups = self._load_groups()
         self.tournament = self._load_tournament()
         self.venues_data = self._load_venues()
-        self.fixtures = self._generate_fixtures()
+        self.schedule = self._load_schedule()
+        self.fixtures = self._build_fixtures()
 
     # ── Data loading ─────────────────────────────────────────────────────────
 
@@ -66,86 +39,61 @@ class FixtureManager:
         with open(os.path.join(DATA_DIR, "groups.json")) as f:
             return json.load(f)["venues"]
 
-    # ── Fixture generation ────────────────────────────────────────────────────
+    def _load_schedule(self):
+        with open(os.path.join(DATA_DIR, "schedule.json")) as f:
+            return json.load(f)
 
-    def _generate_fixtures(self):
+    # ── Fixture building ─────────────────────────────────────────────────────
+
+    def _build_fixtures(self):
         fixtures = []
         match_id = 1
 
-        # ── Group Stage ──────────────────────────────────────────────────────
-        # Matchday base dates
-        md_bases = {
-            1: date(2026, 6, 11),
-            2: date(2026, 6, 19),
-            3: date(2026, 6, 27),
-        }
-        groups_list = list(self.groups.keys())  # A-L
+        # Group stage — resolve slot indices to actual team IDs
+        for entry in self.schedule["group_stage"]:
+            grp = entry["group"]
+            teams = self.groups[grp]
+            home = teams[entry["home_slot"]]
+            away = teams[entry["away_slot"]]
+            fixtures.append({
+                "id": f"GS{match_id:03d}",
+                "stage": "Group Stage",
+                "group": grp,
+                "matchday": entry["matchday"],
+                "home": home,
+                "away": away,
+                "date": entry["date"],
+                "time": entry["time"],
+                "venue": entry["venue"],
+                "city": entry["city"],
+                "country": entry["country"],
+                "home_score": None,
+                "away_score": None,
+                "status": "upcoming",
+            })
+            match_id += 1
 
-        venue_idx = 0
-        for g_idx, group in enumerate(groups_list):
-            teams = self.groups[group]
-            # 3 matchday pairs per group: (0,1)+(2,3), (0,2)+(1,3), (0,3)+(1,2)
-            matchdays = [
-                [(teams[0], teams[1]), (teams[2], teams[3])],
-                [(teams[0], teams[2]), (teams[1], teams[3])],
-                [(teams[0], teams[3]), (teams[1], teams[2])],
-            ]
-            for md_num, pairs in enumerate(matchdays, start=1):
-                match_date = md_bases[md_num] + timedelta(days=g_idx % 6)
-                kick_offs = ["15:00", "18:00", "21:00"]
-                for p_idx, (home, away) in enumerate(pairs):
-                    v = VENUES[venue_idx % len(VENUES)]
-                    fixtures.append({
-                        "id": f"GS{match_id:03d}",
-                        "stage": "Group Stage",
-                        "group": group,
-                        "matchday": md_num,
-                        "home": home,
-                        "away": away,
-                        "date": str(match_date + timedelta(days=p_idx)),
-                        "time": kick_offs[p_idx % 3],
-                        "venue": v[0],
-                        "city": v[1],
-                        "country": v[2],
-                        "home_score": None,
-                        "away_score": None,
-                        "status": "upcoming",
-                    })
-                    match_id += 1
-                    venue_idx += 1
-
-        # ── Knockout Stage slots (TBD teams) ─────────────────────────────────
-        ko_stages = [
-            ("Round of 32", 16, date(2026, 6, 28)),
-            ("Round of 16", 8,  date(2026, 7, 4)),
-            ("Quarter-finals", 4, date(2026, 7, 9)),
-            ("Semi-finals", 2, date(2026, 7, 14)),
-            ("3rd Place Play-off", 1, date(2026, 7, 18)),
-            ("Final", 1, date(2026, 7, 19)),
-        ]
+        # Knockout stage — teams TBD until group stage finishes
         ko_id = 1
-        kv_idx = 0
-        for stage_name, num_matches, base_date in ko_stages:
-            for i in range(num_matches):
-                v = KO_VENUES[kv_idx % len(KO_VENUES)]
-                fixtures.append({
-                    "id": f"KO{ko_id:03d}",
-                    "stage": stage_name,
-                    "group": None,
-                    "matchday": None,
-                    "home": "TBD",
-                    "away": "TBD",
-                    "date": str(base_date + timedelta(days=i % 4)),
-                    "time": "20:00",
-                    "venue": v[0],
-                    "city": v[1],
-                    "country": v[2],
-                    "home_score": None,
-                    "away_score": None,
-                    "status": "upcoming",
-                })
-                ko_id += 1
-                kv_idx += 1
+        for entry in self.schedule["knockout"]:
+            fixtures.append({
+                "id": f"KO{ko_id:03d}",
+                "stage": entry["stage"],
+                "group": None,
+                "matchday": None,
+                "home": "TBD",
+                "away": "TBD",
+                "date": entry["date"],
+                "time": entry["time"],
+                "venue": entry["venue"],
+                "city": entry["city"],
+                "country": entry["country"],
+                "home_score": None,
+                "away_score": None,
+                "status": "upcoming",
+                "matchup": entry.get("matchup"),
+            })
+            ko_id += 1
 
         return fixtures
 

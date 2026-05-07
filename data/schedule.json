@@ -1,0 +1,132 @@
+{
+  "_comment": "Official 2026 FIFA World Cup schedule. All times converted to Argentina time (ART, UTC-3). For group matches, home/away identify the index (0-3) in groups.json's group array. For KO matches, teams are TBD until group stage completes. Sources: FIFA, Yahoo Sports, Sky Sports, NBC, Al Jazeera (Dec 2025 schedule release).",
+  "timezone": "America/Argentina/Buenos_Aires (UTC-3)",
+  "group_stage": [
+    {"group": "A", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-11", "time": "16:00", "venue": "Estadio Azteca", "city": "Mexico City", "country": "Mexico", "et_time": "15:00"},
+    {"group": "A", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-11", "time": "23:00", "venue": "Estadio Akron", "city": "Guadalajara", "country": "Mexico", "et_time": "22:00"},
+    {"group": "A", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-18", "time": "13:00", "venue": "Mercedes-Benz Stadium", "city": "Atlanta, GA", "country": "USA", "et_time": "12:00"},
+    {"group": "A", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-18", "time": "22:00", "venue": "Estadio Akron", "city": "Guadalajara", "country": "Mexico", "et_time": "21:00"},
+    {"group": "A", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-24", "time": "22:00", "venue": "Estadio Azteca", "city": "Mexico City", "country": "Mexico", "et_time": "21:00"},
+    {"group": "A", "matchday": 3, "home_slot": 1, "away_slot": 2, "date": "2026-06-24", "time": "22:00", "venue": "Estadio BBVA", "city": "Monterrey", "country": "Mexico", "et_time": "21:00"},
+
+    {"group": "B", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-12", "time": "16:00", "venue": "BMO Field", "city": "Toronto, ON", "country": "Canada", "et_time": "15:00"},
+    {"group": "B", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-13", "time": "16:00", "venue": "Levi's Stadium", "city": "Santa Clara, CA", "country": "USA", "et_time": "15:00"},
+    {"group": "B", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-18", "time": "16:00", "venue": "SoFi Stadium", "city": "Inglewood, CA", "country": "USA", "et_time": "15:00"},
+    {"group": "B", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-18", "time": "19:00", "venue": "BC Place", "city": "Vancouver, BC", "country": "Canada", "et_time": "18:00"},
+    {"group": "B", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-24", "time": "16:00", "venue": "BC Place", "city": "Vancouver, BC", "country": "Canada", "et_time": "15:00"},
+    {"group": "B", "matchday": 3, "home_slot": 1, "away_slot": 2, "date": "2026-06-24", "time": "16:00", "venue": "Lumen Field", "city": "Seattle, WA", "country": "USA", "et_time": "15:00"},
+
+    {"group": "C", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-13", "time": "19:00", "venue": "MetLife Stadium", "city": "New York/New Jersey", "country": "USA", "et_time": "18:00"},
+    {"group": "C", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-13", "time": "22:00", "venue": "Gillette Stadium", "city": "Foxborough, MA", "country": "USA", "et_time": "21:00"},
+    {"group": "C", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-19", "time": "19:00", "venue": "Gillette Stadium", "city": "Foxborough, MA", "country": "USA", "et_time": "18:00"},
+    {"group": "C", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-19", "time": "22:00", "venue": "Lincoln Financial Field", "city": "Philadelphia, PA", "country": "USA", "et_time": "21:00"},
+    {"group": "C", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-24", "time": "19:00", "venue": "Hard Rock Stadium", "city": "Miami Gardens, FL", "country": "USA", "et_time": "18:00"},
+    {"group": "C", "matchday": 3, "home_slot": 1, "away_slot": 2, "date": "2026-06-24", "time": "19:00", "venue": "Mercedes-Benz Stadium", "city": "Atlanta, GA", "country": "USA", "et_time": "18:00"},
+
+    {"group": "D", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-12", "time": "22:00", "venue": "SoFi Stadium", "city": "Inglewood, CA", "country": "USA", "et_time": "21:00"},
+    {"group": "D", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-13", "time": "01:00", "venue": "BC Place", "city": "Vancouver, BC", "country": "Canada", "et_time": "00:00 (Jun 13)"},
+    {"group": "D", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-19", "time": "16:00", "venue": "Lumen Field", "city": "Seattle, WA", "country": "USA", "et_time": "15:00"},
+    {"group": "D", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-20", "time": "00:00", "venue": "Levi's Stadium", "city": "Santa Clara, CA", "country": "USA", "et_time": "23:00 (Jun 19)"},
+    {"group": "D", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-25", "time": "23:00", "venue": "SoFi Stadium", "city": "Inglewood, CA", "country": "USA", "et_time": "22:00"},
+    {"group": "D", "matchday": 3, "home_slot": 1, "away_slot": 2, "date": "2026-06-25", "time": "23:00", "venue": "Levi's Stadium", "city": "Santa Clara, CA", "country": "USA", "et_time": "22:00"},
+
+    {"group": "E", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-14", "time": "14:00", "venue": "NRG Stadium", "city": "Houston, TX", "country": "USA", "et_time": "13:00"},
+    {"group": "E", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-14", "time": "20:00", "venue": "Lincoln Financial Field", "city": "Philadelphia, PA", "country": "USA", "et_time": "19:00"},
+    {"group": "E", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-20", "time": "17:00", "venue": "BMO Field", "city": "Toronto, ON", "country": "Canada", "et_time": "16:00"},
+    {"group": "E", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-20", "time": "21:00", "venue": "Arrowhead Stadium", "city": "Kansas City, MO", "country": "USA", "et_time": "20:00"},
+    {"group": "E", "matchday": 3, "home_slot": 1, "away_slot": 2, "date": "2026-06-25", "time": "17:00", "venue": "Lincoln Financial Field", "city": "Philadelphia, PA", "country": "USA", "et_time": "16:00"},
+    {"group": "E", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-25", "time": "17:00", "venue": "MetLife Stadium", "city": "New York/New Jersey", "country": "USA", "et_time": "16:00"},
+
+    {"group": "F", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-14", "time": "17:00", "venue": "AT&T Stadium", "city": "Arlington, TX", "country": "USA", "et_time": "16:00"},
+    {"group": "F", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-14", "time": "23:00", "venue": "Estadio BBVA", "city": "Monterrey", "country": "Mexico", "et_time": "22:00"},
+    {"group": "F", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-20", "time": "14:00", "venue": "NRG Stadium", "city": "Houston, TX", "country": "USA", "et_time": "13:00"},
+    {"group": "F", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-20", "time": "01:00", "venue": "Estadio BBVA", "city": "Monterrey", "country": "Mexico", "et_time": "00:00 (Jun 20)"},
+    {"group": "F", "matchday": 3, "home_slot": 1, "away_slot": 2, "date": "2026-06-25", "time": "20:00", "venue": "AT&T Stadium", "city": "Arlington, TX", "country": "USA", "et_time": "19:00"},
+    {"group": "F", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-25", "time": "20:00", "venue": "Arrowhead Stadium", "city": "Kansas City, MO", "country": "USA", "et_time": "19:00"},
+
+    {"group": "G", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-15", "time": "16:00", "venue": "Lumen Field", "city": "Seattle, WA", "country": "USA", "et_time": "15:00"},
+    {"group": "G", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-15", "time": "22:00", "venue": "SoFi Stadium", "city": "Inglewood, CA", "country": "USA", "et_time": "21:00"},
+    {"group": "G", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-21", "time": "16:00", "venue": "SoFi Stadium", "city": "Inglewood, CA", "country": "USA", "et_time": "15:00"},
+    {"group": "G", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-21", "time": "22:00", "venue": "BC Place", "city": "Vancouver, BC", "country": "Canada", "et_time": "21:00"},
+    {"group": "G", "matchday": 3, "home_slot": 1, "away_slot": 2, "date": "2026-06-27", "time": "00:00", "venue": "Lumen Field", "city": "Seattle, WA", "country": "USA", "et_time": "23:00 (Jun 26)"},
+    {"group": "G", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-27", "time": "00:00", "venue": "BC Place", "city": "Vancouver, BC", "country": "Canada", "et_time": "23:00 (Jun 26)"},
+
+    {"group": "H", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-15", "time": "13:00", "venue": "Mercedes-Benz Stadium", "city": "Atlanta, GA", "country": "USA", "et_time": "12:00"},
+    {"group": "H", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-15", "time": "19:00", "venue": "Hard Rock Stadium", "city": "Miami Gardens, FL", "country": "USA", "et_time": "18:00"},
+    {"group": "H", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-21", "time": "13:00", "venue": "Mercedes-Benz Stadium", "city": "Atlanta, GA", "country": "USA", "et_time": "12:00"},
+    {"group": "H", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-21", "time": "19:00", "venue": "Hard Rock Stadium", "city": "Miami Gardens, FL", "country": "USA", "et_time": "18:00"},
+    {"group": "H", "matchday": 3, "home_slot": 1, "away_slot": 2, "date": "2026-06-26", "time": "21:00", "venue": "NRG Stadium", "city": "Houston, TX", "country": "USA", "et_time": "20:00"},
+    {"group": "H", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-26", "time": "21:00", "venue": "Estadio Akron", "city": "Guadalajara", "country": "Mexico", "et_time": "20:00"},
+
+    {"group": "I", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-16", "time": "16:00", "venue": "MetLife Stadium", "city": "New York/New Jersey", "country": "USA", "et_time": "15:00"},
+    {"group": "I", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-16", "time": "19:00", "venue": "Gillette Stadium", "city": "Foxborough, MA", "country": "USA", "et_time": "18:00"},
+    {"group": "I", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-22", "time": "18:00", "venue": "Lincoln Financial Field", "city": "Philadelphia, PA", "country": "USA", "et_time": "17:00"},
+    {"group": "I", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-22", "time": "21:00", "venue": "MetLife Stadium", "city": "New York/New Jersey", "country": "USA", "et_time": "20:00"},
+    {"group": "I", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-26", "time": "16:00", "venue": "Gillette Stadium", "city": "Foxborough, MA", "country": "USA", "et_time": "15:00"},
+    {"group": "I", "matchday": 3, "home_slot": 1, "away_slot": 2, "date": "2026-06-26", "time": "16:00", "venue": "BMO Field", "city": "Toronto, ON", "country": "Canada", "et_time": "15:00"},
+
+    {"group": "J", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-16", "time": "22:00", "venue": "Arrowhead Stadium", "city": "Kansas City, MO", "country": "USA", "et_time": "21:00"},
+    {"group": "J", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-17", "time": "01:00", "venue": "Levi's Stadium", "city": "Santa Clara, CA", "country": "USA", "et_time": "00:00 (Jun 17)"},
+    {"group": "J", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-22", "time": "14:00", "venue": "AT&T Stadium", "city": "Arlington, TX", "country": "USA", "et_time": "13:00"},
+    {"group": "J", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-23", "time": "00:00", "venue": "Levi's Stadium", "city": "Santa Clara, CA", "country": "USA", "et_time": "23:00 (Jun 22)"},
+    {"group": "J", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-27", "time": "23:00", "venue": "AT&T Stadium", "city": "Arlington, TX", "country": "USA", "et_time": "22:00"},
+    {"group": "J", "matchday": 3, "home_slot": 1, "away_slot": 2, "date": "2026-06-27", "time": "23:00", "venue": "Arrowhead Stadium", "city": "Kansas City, MO", "country": "USA", "et_time": "22:00"},
+
+    {"group": "K", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-17", "time": "14:00", "venue": "NRG Stadium", "city": "Houston, TX", "country": "USA", "et_time": "13:00"},
+    {"group": "K", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-17", "time": "23:00", "venue": "Estadio Azteca", "city": "Mexico City", "country": "Mexico", "et_time": "22:00"},
+    {"group": "K", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-23", "time": "14:00", "venue": "NRG Stadium", "city": "Houston, TX", "country": "USA", "et_time": "13:00"},
+    {"group": "K", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-23", "time": "23:00", "venue": "Estadio Akron", "city": "Guadalajara", "country": "Mexico", "et_time": "22:00"},
+    {"group": "K", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-27", "time": "20:30", "venue": "Hard Rock Stadium", "city": "Miami Gardens, FL", "country": "USA", "et_time": "19:30"},
+    {"group": "K", "matchday": 3, "home_slot": 1, "away_slot": 2, "date": "2026-06-27", "time": "20:30", "venue": "Mercedes-Benz Stadium", "city": "Atlanta, GA", "country": "USA", "et_time": "19:30"},
+
+    {"group": "L", "matchday": 1, "home_slot": 0, "away_slot": 1, "date": "2026-06-17", "time": "17:00", "venue": "AT&T Stadium", "city": "Arlington, TX", "country": "USA", "et_time": "16:00"},
+    {"group": "L", "matchday": 1, "home_slot": 2, "away_slot": 3, "date": "2026-06-17", "time": "20:00", "venue": "BMO Field", "city": "Toronto, ON", "country": "Canada", "et_time": "19:00"},
+    {"group": "L", "matchday": 2, "home_slot": 0, "away_slot": 2, "date": "2026-06-23", "time": "17:00", "venue": "Gillette Stadium", "city": "Foxborough, MA", "country": "USA", "et_time": "16:00"},
+    {"group": "L", "matchday": 2, "home_slot": 3, "away_slot": 1, "date": "2026-06-23", "time": "20:00", "venue": "BMO Field", "city": "Toronto, ON", "country": "Canada", "et_time": "19:00"},
+    {"group": "L", "matchday": 3, "home_slot": 3, "away_slot": 0, "date": "2026-06-27", "time": "18:00", "venue": "MetLife Stadium", "city": "New York/New Jersey", "country": "USA", "et_time": "17:00"},
+    {"group": "L", "matchday": 3, "home_slot": 2, "away_slot": 1, "date": "2026-06-27", "time": "18:00", "venue": "Lincoln Financial Field", "city": "Philadelphia, PA", "country": "USA", "et_time": "17:00"}
+  ],
+  "knockout": [
+    {"stage": "Round of 32", "date": "2026-06-28", "time": "13:00", "venue": "Mercedes-Benz Stadium", "city": "Atlanta, GA", "country": "USA", "et_time": "12:00", "matchup": "1L vs Best 3rd (E/H/I/J/K)"},
+    {"stage": "Round of 32", "date": "2026-06-28", "time": "16:00", "venue": "SoFi Stadium", "city": "Inglewood, CA", "country": "USA", "et_time": "15:00", "matchup": "2A vs 2B"},
+    {"stage": "Round of 32", "date": "2026-06-28", "time": "18:00", "venue": "MetLife Stadium", "city": "New York/New Jersey", "country": "USA", "et_time": "17:00", "matchup": "1I vs Best 3rd (C/D/F/G/H)"},
+    {"stage": "Round of 32", "date": "2026-06-28", "time": "22:00", "venue": "Estadio Azteca", "city": "Mexico City", "country": "Mexico", "et_time": "21:00", "matchup": "1A vs Best 3rd (C/E/F/H/I)"},
+
+    {"stage": "Round of 32", "date": "2026-06-29", "time": "14:00", "venue": "NRG Stadium", "city": "Houston, TX", "country": "USA", "et_time": "13:00", "matchup": "1C vs 2F"},
+    {"stage": "Round of 32", "date": "2026-06-29", "time": "17:30", "venue": "Gillette Stadium", "city": "Foxborough, MA", "country": "USA", "et_time": "16:30", "matchup": "1E vs Best 3rd (A/B/C/D/F)"},
+    {"stage": "Round of 32", "date": "2026-06-29", "time": "21:00", "venue": "Levi's Stadium", "city": "Santa Clara, CA", "country": "USA", "et_time": "20:00", "matchup": "1D vs Best 3rd (B/E/F/I/J)"},
+    {"stage": "Round of 32", "date": "2026-06-29", "time": "22:00", "venue": "Estadio BBVA", "city": "Monterrey", "country": "Mexico", "et_time": "21:00", "matchup": "1F vs 2C"},
+
+    {"stage": "Round of 32", "date": "2026-06-30", "time": "14:00", "venue": "AT&T Stadium", "city": "Arlington, TX", "country": "USA", "et_time": "13:00", "matchup": "2E vs 2I"},
+    {"stage": "Round of 32", "date": "2026-06-30", "time": "17:00", "venue": "Lumen Field", "city": "Seattle, WA", "country": "USA", "et_time": "16:00", "matchup": "1G vs Best 3rd (A/E/H/I/J)"},
+    {"stage": "Round of 32", "date": "2026-06-30", "time": "19:00", "venue": "Hard Rock Stadium", "city": "Miami Gardens, FL", "country": "USA", "et_time": "18:00", "matchup": "1J vs 2H"},
+
+    {"stage": "Round of 32", "date": "2026-07-01", "time": "15:00", "venue": "AT&T Stadium", "city": "Arlington, TX", "country": "USA", "et_time": "14:00", "matchup": "2D vs 2G"},
+    {"stage": "Round of 32", "date": "2026-07-01", "time": "20:00", "venue": "BMO Field", "city": "Toronto, ON", "country": "Canada", "et_time": "19:00", "matchup": "2K vs 2L"},
+    {"stage": "Round of 32", "date": "2026-07-01", "time": "22:30", "venue": "Arrowhead Stadium", "city": "Kansas City, MO", "country": "USA", "et_time": "21:30", "matchup": "1K vs Best 3rd (D/F/G/H/I)"},
+
+    {"stage": "Round of 32", "date": "2026-07-02", "time": "16:00", "venue": "SoFi Stadium", "city": "Inglewood, CA", "country": "USA", "et_time": "15:00", "matchup": "1H vs 2J"},
+    {"stage": "Round of 32", "date": "2026-07-03", "time": "00:00", "venue": "BC Place", "city": "Vancouver, BC", "country": "Canada", "et_time": "23:00 (Jul 2)", "matchup": "1B vs Best 3rd (E/F/G/H/J)"},
+
+    {"stage": "Round of 16", "date": "2026-07-04", "time": "14:00", "venue": "NRG Stadium", "city": "Houston, TX", "country": "USA", "et_time": "13:00"},
+    {"stage": "Round of 16", "date": "2026-07-04", "time": "18:00", "venue": "Lincoln Financial Field", "city": "Philadelphia, PA", "country": "USA", "et_time": "17:00"},
+    {"stage": "Round of 16", "date": "2026-07-05", "time": "17:00", "venue": "MetLife Stadium", "city": "New York/New Jersey", "country": "USA", "et_time": "16:00"},
+    {"stage": "Round of 16", "date": "2026-07-05", "time": "21:00", "venue": "Estadio Azteca", "city": "Mexico City", "country": "Mexico", "et_time": "20:00"},
+    {"stage": "Round of 16", "date": "2026-07-06", "time": "16:00", "venue": "AT&T Stadium", "city": "Arlington, TX", "country": "USA", "et_time": "15:00"},
+    {"stage": "Round of 16", "date": "2026-07-06", "time": "21:00", "venue": "Lumen Field", "city": "Seattle, WA", "country": "USA", "et_time": "20:00"},
+    {"stage": "Round of 16", "date": "2026-07-07", "time": "13:00", "venue": "Mercedes-Benz Stadium", "city": "Atlanta, GA", "country": "USA", "et_time": "12:00"},
+    {"stage": "Round of 16", "date": "2026-07-07", "time": "17:00", "venue": "BC Place", "city": "Vancouver, BC", "country": "Canada", "et_time": "16:00"},
+
+    {"stage": "Quarter-finals", "date": "2026-07-09", "time": "17:00", "venue": "Gillette Stadium", "city": "Foxborough, MA", "country": "USA", "et_time": "16:00"},
+    {"stage": "Quarter-finals", "date": "2026-07-10", "time": "13:00", "venue": "SoFi Stadium", "city": "Inglewood, CA", "country": "USA", "et_time": "12:00"},
+    {"stage": "Quarter-finals", "date": "2026-07-11", "time": "18:00", "venue": "Hard Rock Stadium", "city": "Miami Gardens, FL", "country": "USA", "et_time": "17:00"},
+    {"stage": "Quarter-finals", "date": "2026-07-11", "time": "21:00", "venue": "Arrowhead Stadium", "city": "Kansas City, MO", "country": "USA", "et_time": "20:00"},
+
+    {"stage": "Semi-finals", "date": "2026-07-14", "time": "15:00", "venue": "AT&T Stadium", "city": "Arlington, TX", "country": "USA", "et_time": "14:00"},
+    {"stage": "Semi-finals", "date": "2026-07-15", "time": "16:00", "venue": "Mercedes-Benz Stadium", "city": "Atlanta, GA", "country": "USA", "et_time": "15:00"},
+
+    {"stage": "3rd Place Play-off", "date": "2026-07-18", "time": "18:00", "venue": "Hard Rock Stadium", "city": "Miami Gardens, FL", "country": "USA", "et_time": "17:00"},
+
+    {"stage": "Final", "date": "2026-07-19", "time": "16:00", "venue": "MetLife Stadium", "city": "New York/New Jersey", "country": "USA", "et_time": "15:00"}
+  ]
+}

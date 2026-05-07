@@ -306,13 +306,13 @@ def page_home(fm: FixtureManager, engine: ForecastEngine):
     with col_r:
         st.subheader("📅 Calendario del Torneo")
         timeline = [
-            ("11 Jun – 3 Jul", "Fase de Grupos", "🟩"),
-            ("4 – 7 Jul",       "Dieciseisavos de Final", "🟨"),
-            ("8 – 11 Jul",      "Octavos de Final", "🟧"),
-            ("12 – 13 Jul",     "Cuartos de Final", "🟥"),
-            ("15 – 16 Jul",     "Semifinales",   "🔵"),
-            ("18 Jul",          "3er Puesto",     "⚪"),
-            ("19 Jul",          "⭐ Final",       "🏆"),
+            ("11 – 27 Jun",     "Fase de Grupos",          "🟩"),
+            ("28 Jun – 3 Jul",  "Dieciseisavos de Final",  "🟨"),
+            ("4 – 7 Jul",       "Octavos de Final",        "🟧"),
+            ("9 – 11 Jul",      "Cuartos de Final",        "🟥"),
+            ("14 – 15 Jul",     "Semifinales",             "🔵"),
+            ("18 Jul",          "3er Puesto",              "⚪"),
+            ("19 Jul",          "⭐ Final",                "🏆"),
         ]
         for dates, stage, icon in timeline:
             st.markdown(f"""
@@ -432,7 +432,7 @@ def page_fixtures(fm: FixtureManager, engine: ForecastEngine):
         st.markdown(f"""
         <div class="match-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span style="color:#888; font-size:0.75rem;">{format_date(m['date'])} · {m['time']}</span>
+                <span style="color:#888; font-size:0.75rem;">{format_date(m['date'])} · {m['time']} hs (ARG)</span>
                 <span style="background:#0a2a1a; color:#FFD700; border-radius:20px;
                              padding:2px 10px; font-size:0.72rem; font-weight:700;">
                     {stage_tag}{f' · {group_tag}' if group_tag else ''}
@@ -806,7 +806,7 @@ def page_predictions(fm: FixtureManager, engine: ForecastEngine):
             st.markdown(f"""
             <div style="display:flex; justify-content:space-between; align-items:center;
                         margin-bottom:6px;">
-                <span style="color:#888; font-size:0.8rem;">{format_date(m['date'])} · {m['time']}</span>
+                <span style="color:#888; font-size:0.8rem;">{format_date(m['date'])} · {m['time']} hs (ARG)</span>
                 <span style="background:#0a2a1a; color:#FFD700; border-radius:20px;
                              padding:2px 10px; font-size:0.72rem;">
                     {STAGE_TR.get(m['stage'], m['stage'])}{f" · Grupo {m['group']}" if m['group'] else ""}
