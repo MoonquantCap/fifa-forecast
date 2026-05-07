@@ -346,7 +346,9 @@ class ForecastEngine:
             winners = []
             for h, a in pairs:
                 pred = self.predict_match(h, a, neutral=True)
-                winner = h if pred["home_win_prob"] >= pred["away_win_prob"] else a
+                # KO match: draw → extra time / penalties (modelled as 50/50)
+                p_home_adv = pred["home_win_prob"] + pred["draw_prob"] * 0.5
+                winner = h if random.random() < p_home_adv else a
                 results.append({
                     "home": h, "away": a, "winner": winner, "pred": pred,
                 })
