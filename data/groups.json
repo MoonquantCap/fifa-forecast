@@ -1,16 +1,16 @@
 {
   "groups": {
-    "A": ["MEX", "RSA", "KOR", "DEN"],
-    "B": ["CAN", "ITA", "QAT", "SUI"],
+    "A": ["MEX", "RSA", "KOR", "CZE"],
+    "B": ["CAN", "BIH", "QAT", "SUI"],
     "C": ["BRA", "MAR", "HAI", "SCO"],
     "D": ["USA", "PAR", "AUS", "TUR"],
     "E": ["GER", "CUW", "CIV", "ECU"],
-    "F": ["NED", "JPN", "UKR", "TUN"],
+    "F": ["NED", "JPN", "SWE", "TUN"],
     "G": ["BEL", "EGY", "IRN", "NZL"],
     "H": ["ESP", "CPV", "KSA", "URU"],
     "I": ["FRA", "SEN", "IRQ", "NOR"],
     "J": ["ARG", "ALG", "AUT", "JOR"],
-    "K": ["POR", "COL", "UZB", "JAM"],
+    "K": ["POR", "COD", "UZB", "COL"],
     "L": ["ENG", "CRO", "GHA", "PAN"]
   },
   "tournament": {
