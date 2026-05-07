@@ -193,10 +193,12 @@ def compute_match_probs(
         total_s = S_home + S_away
         p_dom = S_home / total_s if total_s > 0 else 0.5
 
-        # Expected goals: centred at 1.35/1.10 (avg WC scoring rates),
-        # scaled ±1.5 by dominance deviation from 0.5
-        lam_h = max(0.15, 1.35 + (p_dom - 0.5) * 3.0)
-        lam_a = max(0.15, 1.10 - (p_dom - 0.5) * 3.0)
+        # Expected goals: neutral venues use symmetric 1.225 base for both
+        # teams; non-neutral uses WC averages 1.35 (home) / 1.10 (away)
+        base_h = 1.225 if neutral else 1.35
+        base_a = 1.225 if neutral else 1.10
+        lam_h = max(0.15, base_h + (p_dom - 0.5) * 3.0)
+        lam_a = max(0.15, base_a - (p_dom - 0.5) * 3.0)
 
         gh = _poisson(lam_h)
         ga = _poisson(lam_a)
