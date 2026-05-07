@@ -1189,6 +1189,19 @@ def main():
         ], label_visibility="collapsed")
 
         st.markdown("---")
+        st.markdown("""
+        <a href="https://ics.fixtur.es/v2/league/fifa-world-cup-2026.ics"
+           style="display:block; text-align:center; padding:8px 12px;
+                  background:#FFD700; color:#1a1a1a; border-radius:6px;
+                  font-weight:700; font-size:0.85rem; text-decoration:none;">
+            📆 Agregar al calendario
+        </a>
+        <div style="font-size:0.68rem; color:#777; text-align:center; padding:4px 0 0;">
+            Suscribite con Google / Apple / Outlook
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("---")
         # Quick stats
         total = fm.total_matches
         done  = fm.completed_matches
